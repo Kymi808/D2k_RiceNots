@@ -147,17 +147,21 @@ class PhysicsLoss(nn.Module):
 
             # Me should be bounded [0, ~6] for hypersonic reentry
             me_log = preds['me'] * self.y_std[self.idx_map['me']] + self.y_mean[self.idx_map['me']]
+            me_log = torch.clamp(me_log, min=-10.0, max=20.0)
             me_val = torch.pow(10.0, me_log)
             losses['me_bound'] = F.relu(me_val - 6.0).pow(2).mean()
 
         return losses
 
 
-def compute_physics_loss(losses_dict, cfg):
+def compute_physics_loss(losses_dict, cfg, epoch=1):
     """
-    Weighted sum of physics loss terms.
+    Weighted sum of physics loss terms with warmup and NaN guard.
     Returns (total_physics_loss, individual_weighted_terms).
     """
+    # Linear warmup: 0 at epoch 1, full weight at physics_warmup_epochs
+    warmup = min(1.0, epoch / max(1, cfg.physics_warmup_epochs))
+
     weight_map = {
         'positivity': cfg.lambda_positivity,
         'reynolds_bound': cfg.lambda_reynolds,
@@ -174,8 +178,12 @@ def compute_physics_loss(losses_dict, cfg):
     for name, loss in losses_dict.items():
         w = weight_map.get(name, 0.01)
         if torch.is_tensor(loss):
+            # NaN/Inf guard — skip this term if it's bad
+            if torch.isnan(loss) or torch.isinf(loss):
+                weighted[name] = 0.0
+                continue
             total = total.to(loss.device)
-            weighted_loss = w * loss
+            weighted_loss = warmup * w * loss
             total = total + weighted_loss
             weighted[name] = weighted_loss.item()
         else:

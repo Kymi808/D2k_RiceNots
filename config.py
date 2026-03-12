@@ -42,7 +42,7 @@ class Config:
 
     # --- Loss weights ---
     # Data loss weights (qw prioritized 3x)
-    w_qw: float = 2.0
+    w_qw: float = 3.0
     w_pw: float = 1.0
     w_tw: float = 1.0
     w_me: float = 1.0
@@ -55,6 +55,9 @@ class Config:
     lambda_cf_bounds: float = 0.02
     lambda_bl_consistency: float = 0.01
     lambda_positivity: float = 0.01
+
+    # Physics loss warmup: linearly ramp from 0 to full weight over this many epochs
+    physics_warmup_epochs: int = 30
 
     # --- Training ---
     batch_size: int = 4                 # total across GPUs (1 per GPU x 4 GPUs)

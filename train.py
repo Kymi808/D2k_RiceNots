@@ -60,7 +60,7 @@ def is_main(rank):
 # ============================================================
 
 def compute_loss(out, X_batch, Y_batch, cfg, y_col_names, y_weights,
-                 physics_loss_fn, scaler_X):
+                 physics_loss_fn, scaler_X, epoch=1):
     """Compute weighted data loss + reconstruction loss + physics losses."""
     loss_dict = {}
     total_data_loss = torch.tensor(0.0, device=X_batch.device)
@@ -79,9 +79,9 @@ def compute_loss(out, X_batch, Y_batch, cfg, y_col_names, y_weights,
     recon_loss = F.mse_loss(out['recon'], X_batch)
     loss_dict['recon'] = recon_loss.item()
 
-    # Physics losses
+    # Physics losses (with warmup)
     phys_raw = physics_loss_fn(preds_dict, X_batch, scaler_X)
-    phys_total, phys_weighted = compute_physics_loss(phys_raw, cfg)
+    phys_total, phys_weighted = compute_physics_loss(phys_raw, cfg, epoch=epoch)
     for k, v in phys_weighted.items():
         loss_dict[f'phys_{k}'] = v
 
@@ -95,9 +95,11 @@ def compute_loss(out, X_batch, Y_batch, cfg, y_col_names, y_weights,
 # ============================================================
 
 def train_epoch(model, dl, optimizer, scaler_amp, cfg, y_col_names, y_weights,
-                physics_loss_fn, scaler_X, device, use_amp):
+                physics_loss_fn, scaler_X, device, use_amp, epoch=1):
     model.train()
     epoch_losses = {}
+    nan_batches = 0
+    n_batches = 0
     for X_batch, Y_batch in dl:
         X_batch, Y_batch = X_batch.to(device), Y_batch.to(device)
         optimizer.zero_grad(set_to_none=True)
@@ -106,25 +108,35 @@ def train_epoch(model, dl, optimizer, scaler_amp, cfg, y_col_names, y_weights,
             out = model(X_batch)
             loss, loss_dict = compute_loss(
                 out, X_batch, Y_batch, cfg, y_col_names, y_weights,
-                physics_loss_fn, scaler_X
+                physics_loss_fn, scaler_X, epoch=epoch
             )
+
+        # NaN guard: skip batch if loss is NaN/Inf
+        if not torch.isfinite(loss):
+            nan_batches += 1
+            optimizer.zero_grad(set_to_none=True)
+            scaler_amp.update()  # keep scaler in sync
+            if nan_batches > max(5, len(dl) // 2):
+                raise RuntimeError(f"Too many NaN batches ({nan_batches}), halting training")
+            continue
 
         scaler_amp.scale(loss).backward()
         scaler_amp.unscale_(optimizer)
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
         scaler_amp.step(optimizer)
         scaler_amp.update()
 
+        n_batches += 1
         for k, v in loss_dict.items():
             epoch_losses[k] = epoch_losses.get(k, 0) + v
 
-    n = len(dl)
+    n = max(1, n_batches)
     return {k: v / n for k, v in epoch_losses.items()}
 
 
 @torch.no_grad()
 def eval_epoch(model, dl, cfg, y_col_names, y_weights,
-               physics_loss_fn, scaler_X, device, use_amp):
+               physics_loss_fn, scaler_X, device, use_amp, epoch=1):
     model.eval()
     epoch_losses = {}
     for X_batch, Y_batch in dl:
@@ -133,7 +145,7 @@ def eval_epoch(model, dl, cfg, y_col_names, y_weights,
             out = model(X_batch)
             _, loss_dict = compute_loss(
                 out, X_batch, Y_batch, cfg, y_col_names, y_weights,
-                physics_loss_fn, scaler_X
+                physics_loss_fn, scaler_X, epoch=epoch
             )
         for k, v in loss_dict.items():
             epoch_losses[k] = epoch_losses.get(k, 0) + v
@@ -291,11 +303,12 @@ def main():
         t0 = time.time()
         train_losses = train_epoch(
             model, train_dl, optimizer, scaler_amp, cfg,
-            y_col_names, y_weights, physics_loss_fn, scaler_X, device, use_amp
+            y_col_names, y_weights, physics_loss_fn, scaler_X, device, use_amp,
+            epoch=epoch
         )
         val_losses = eval_epoch(
             model, val_dl, cfg, y_col_names, y_weights,
-            physics_loss_fn, scaler_X, device, use_amp
+            physics_loss_fn, scaler_X, device, use_amp, epoch=epoch
         )
         elapsed = time.time() - t0
 
