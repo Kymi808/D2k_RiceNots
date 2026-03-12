@@ -22,10 +22,15 @@ OUTPUT_LABELS = {
 
 
 @torch.no_grad()
-def evaluate_model(model, dl, scaler_y, y_col_names, Y_raw, device):
+def evaluate_model(model, dl, scaler_y, y_col_names, Y_raw, meta, device):
     """
-    Evaluate model on a DataLoader. Returns per-output metrics in physical units.
-    Y_raw: raw (unscaled) target array for ground truth comparison.
+    Evaluate model with overlap averaging across partitions.
+    Predictions from overlapping partitions are averaged per physical point,
+    so each surface point gets a single prediction regardless of how many
+    partitions cover it.
+
+    Y_raw: raw (unscaled) target array, shape (n_partitions, seq_len, n_outputs).
+    meta: list of dicts with location_id, start, end, n_points_orig, n_valid.
     """
     model.eval()
     all_preds = {name: [] for name in y_col_names}
@@ -38,24 +43,53 @@ def evaluate_model(model, dl, scaler_y, y_col_names, Y_raw, device):
             if name in out:
                 all_preds[name].append(out[name].cpu().numpy())
 
+    # (n_partitions, seq_len, 1) per output
+    for name in y_col_names:
+        all_preds[name] = np.concatenate(all_preds[name], axis=0)
+
+    # Inverse transform predictions to physical units
+    pred_phys_all = {}
+    for i, name in enumerate(y_col_names):
+        pred_std = all_preds[name]
+        pred_log = pred_std * scaler_y.scale_[i] + scaler_y.mean_[i]
+        pred_phys_all[name] = np.power(10.0, pred_log)
+
+    # Group partitions by solution
+    sol_parts = {}
+    for pidx, m in enumerate(meta):
+        lid = m['location_id']
+        if lid not in sol_parts:
+            sol_parts[lid] = []
+        sol_parts[lid].append(pidx)
+
+    # Per-output: reconstruct full solutions with overlap averaging
     results = {}
     for i, name in enumerate(y_col_names):
-        pred_std = np.concatenate(all_preds[name], axis=0)
+        all_true, all_pred = [], []
 
-        # Inverse transform: standardized → log10 → physical
-        pred_flat = pred_std.reshape(-1, 1)
-        pred_log = pred_flat * scaler_y.scale_[i] + scaler_y.mean_[i]
-        pred_phys = np.power(10.0, pred_log).ravel()
+        for lid, part_indices in sol_parts.items():
+            n_pts = meta[part_indices[0]]['n_points_orig']
+            pred_sum = np.zeros(n_pts)
+            pred_count = np.zeros(n_pts)
+            true_vals = np.zeros(n_pts)
 
-        true_phys = Y_raw[:, :, i].ravel()
+            for pidx in part_indices:
+                m = meta[pidx]
+                start = m['start']
+                n_valid = m['n_valid']
 
-        # Truncate to matching length (in case of distributed padding)
-        min_len = min(len(pred_phys), len(true_phys))
-        pred_phys = pred_phys[:min_len]
-        true_phys = true_phys[:min_len]
+                pred_sum[start:start + n_valid] += pred_phys_all[name][pidx, :n_valid, 0]
+                pred_count[start:start + n_valid] += 1
+                true_vals[start:start + n_valid] = Y_raw[pidx, :n_valid, i]
+
+            mask = pred_count > 0
+            all_pred.append(pred_sum[mask] / pred_count[mask])
+            all_true.append(true_vals[mask])
+
+        true_phys = np.concatenate(all_true)
+        pred_phys = np.concatenate(all_pred)
 
         rel_errors = np.abs(true_phys - pred_phys) / (true_phys + 1e-9) * 100
-
         mae = mean_absolute_error(true_phys, pred_phys)
         rmse = np.sqrt(mean_squared_error(true_phys, pred_phys))
 

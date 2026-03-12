@@ -26,7 +26,10 @@ echo "GPUs:   $CUDA_VISIBLE_DEVICES"
 echo "Date:   $(date)"
 echo "============================================"
 
-mkdir -p logs results checkpoints
+# Per-job output dirs to avoid overwriting parallel runs
+RUN_DIR=results/run_${SLURM_JOB_ID}
+CKPT_DIR=checkpoints/run_${SLURM_JOB_ID}
+mkdir -p logs $RUN_DIR $CKPT_DIR
 
 # --- Environment ---
 module purge
@@ -58,8 +61,8 @@ torchrun \
     --master_port=29500 \
     train.py \
     --data data/apollo_cfd_database.csv \
-    --save_dir results \
-    --checkpoint_dir checkpoints
+    --save_dir $RUN_DIR \
+    --checkpoint_dir $CKPT_DIR
 
 echo ""
 echo "============================================"
@@ -67,8 +70,10 @@ echo "Job completed: $(date)"
 echo "============================================"
 
 # Print results summary if it exists
-if [ -f results/config_summary.txt ]; then
+if [ -f $RUN_DIR/config_summary.txt ]; then
     echo ""
     echo "=== RESULTS SUMMARY ==="
-    cat results/config_summary.txt
+    cat $RUN_DIR/config_summary.txt
+    echo ""
+    echo "Results in: $RUN_DIR"
 fi

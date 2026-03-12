@@ -126,7 +126,7 @@ class SelectiveSSM(nn.Module):
         ssm_params = self.x_proj(x_ssm)
         B = ssm_params[:, :, :self.d_state]
         C = ssm_params[:, :, self.d_state:2*self.d_state]
-        dt = F.softplus(ssm_params[:, :, -1:])
+        dt = ssm_params[:, :, -1:]
 
         if hasattr(self, 'B_bias'):
             B = B + self.B_bias
@@ -246,7 +246,7 @@ class MambaAutoencoder(nn.Module):
         self.pred_heads = nn.ModuleDict()
         for name, _, _ in config.target_config:
             self.pred_heads[name] = PredictionHead(
-                config.latent_dim, d_hidden=64, n_outputs=1
+                config.d_model, d_hidden=64, n_outputs=1
             )
 
     def forward(self, x):
@@ -256,5 +256,5 @@ class MambaAutoencoder(nn.Module):
 
         out = {'recon': self.recon_head(z), 'latent': z}
         for name, head in self.pred_heads.items():
-            out[name] = head(z)
+            out[name] = head(h)
         return out

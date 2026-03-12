@@ -48,7 +48,7 @@ class Config:
     w_me: float = 1.0
     w_theta: float = 1.0
 
-    lambda_recon: float = 0.2
+    lambda_recon: float = 0.15
     lambda_reynolds: float = 0.05
     lambda_newtonian: float = 0.02
     lambda_fay_riddell: float = 0.01

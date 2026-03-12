@@ -238,7 +238,7 @@ def main():
     if is_main(rank):
         from dataset import get_dataloaders as _get_dl
         (_, _, test_dl_eval, _, _,
-         Y_test_raw_eval, _, _) = _get_dl(
+         Y_test_raw_eval, meta_test_eval, _) = _get_dl(
             cfg, args.data, distributed=False, rank=0, world_size=1
         )
 
@@ -368,7 +368,8 @@ def main():
 
         # Use non-distributed test loader so we evaluate on ALL test data
         test_results = evaluate_model(
-            eval_model, test_dl_eval, scaler_y, y_col_names, Y_test_raw_eval, device
+            eval_model, test_dl_eval, scaler_y, y_col_names, Y_test_raw_eval,
+            meta_test_eval, device
         )
         print_results(test_results, y_col_names, cfg.block_type)
 
