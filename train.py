@@ -70,7 +70,7 @@ def compute_loss(out, X_batch, Y_batch, cfg, y_col_names, y_weights,
         if name in out:
             target = Y_batch[:, :, i:i+1]
             pred = out[name]
-            data_loss = F.mse_loss(pred, target)
+            data_loss = F.smooth_l1_loss(pred, target, beta=1.0)
             weighted = y_weights[i] * data_loss
             loss_dict[f'{name}_mse'] = data_loss.item()
             total_data_loss = total_data_loss + weighted
@@ -115,7 +115,6 @@ def train_epoch(model, dl, optimizer, scaler_amp, cfg, y_col_names, y_weights,
         if not torch.isfinite(loss):
             nan_batches += 1
             optimizer.zero_grad(set_to_none=True)
-            scaler_amp.update()  # keep scaler in sync
             if nan_batches > max(5, len(dl) // 2):
                 raise RuntimeError(f"Too many NaN batches ({nan_batches}), halting training")
             continue

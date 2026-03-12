@@ -49,15 +49,15 @@ class Config:
     w_theta: float = 1.0
 
     lambda_recon: float = 0.15
-    lambda_reynolds: float = 0.05
-    lambda_newtonian: float = 0.02
-    lambda_fay_riddell: float = 0.01
-    lambda_cf_bounds: float = 0.02
-    lambda_bl_consistency: float = 0.01
-    lambda_positivity: float = 0.01
+    lambda_reynolds: float = 0.0075
+    lambda_newtonian: float = 0.003
+    lambda_fay_riddell: float = 0.0015
+    lambda_cf_bounds: float = 0.003
+    lambda_bl_consistency: float = 0.0015
+    lambda_positivity: float = 0.0015
 
     # Physics loss warmup: linearly ramp from 0 to full weight over this many epochs
-    physics_warmup_epochs: int = 30
+    physics_warmup_epochs: int = 70
 
     # --- Training ---
     batch_size: int = 4                 # total across GPUs (1 per GPU x 4 GPUs)

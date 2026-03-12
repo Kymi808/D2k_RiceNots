@@ -40,6 +40,7 @@ PROJECT_DIR=/projects/dsci435/NASA_REENTRY_SP26
 ENV_DIR=$PROJECT_DIR/.conda/envs/mamba-cfd
 export PATH=$ENV_DIR/bin:$PATH
 export PYTHONPATH=$ENV_DIR/lib/python3.11/site-packages:$PYTHONPATH
+export OMP_NUM_THREADS=1
 
 # Verify GPU access
 python -c "

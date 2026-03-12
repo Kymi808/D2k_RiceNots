@@ -101,9 +101,9 @@ class PhysicsLoss(nn.Module):
             q_inf = freestream['q_inf']
 
             # Cp = (pw - p_inf) / q_inf; for high Mach, p_inf << pw
-            # Upper bound: Cp_max ≈ 1.84 for gamma=1.4
+            # Upper bound: Cp_max = 2.0 (real gas at Mach 14+, data max ~1.98)
             Cp = pw_phys / (q_inf + 1e-8)
-            Cp_max = 1.84
+            Cp_max = 2.0
             losses['newtonian'] = F.relu(Cp - Cp_max).pow(2).mean()
 
         # === 4. FAY-RIDDELL SCALING ===
