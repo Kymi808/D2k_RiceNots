@@ -170,6 +170,9 @@ def parse_args():
     parser.add_argument('--latent_dim', type=int, default=None)
     parser.add_argument('--block_type', type=str, default=None)
     parser.add_argument('--no_compile', action='store_true')
+    parser.add_argument('--no_physics', action='store_true', help='Disable all physics losses')
+    parser.add_argument('--qw_only', action='store_true', help='Only predict qw (disable other heads)')
+    parser.add_argument('--w_qw', type=float, default=None, help='Override qw loss weight')
     parser.add_argument('--save_dir', type=str, default='results')
     parser.add_argument('--checkpoint_dir', type=str, default='checkpoints')
     return parser.parse_args()
@@ -207,6 +210,22 @@ def main():
         cfg.latent_dim = args.latent_dim
     if args.block_type is not None:
         cfg.block_type = args.block_type
+
+    # Experiment flags
+    if args.w_qw is not None:
+        cfg.w_qw = args.w_qw
+    if args.qw_only:
+        cfg.predict_pw = False
+        cfg.predict_tw = False
+        cfg.predict_me = False
+        cfg.predict_theta = False
+    if args.no_physics:
+        cfg.lambda_reynolds = 0.0
+        cfg.lambda_newtonian = 0.0
+        cfg.lambda_fay_riddell = 0.0
+        cfg.lambda_cf_bounds = 0.0
+        cfg.lambda_bl_consistency = 0.0
+        cfg.lambda_positivity = 0.0
 
     if is_main(rank):
         print(f"{'=' * 60}")
@@ -378,6 +397,8 @@ def main():
 
         # Save config summary
         with open(os.path.join(args.save_dir, 'config_summary.txt'), 'w') as f:
+            f.write(f"no_physics: {args.no_physics}\n")
+            f.write(f"qw_only: {args.qw_only}\n")
             f.write(f"block_type: {cfg.block_type}\n")
             f.write(f"seq_len: {cfg.seq_len}\n")
             f.write(f"n_partitions: {cfg.n_partitions}\n")
