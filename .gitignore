@@ -1,0 +1,44 @@
+# Data
+*.csv
+*.h5
+*.hdf5
+*.parquet
+data/
+
+# Model checkpoints
+*.pt
+*.pth
+checkpoints/
+
+# Logs
+logs/
+wandb/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.eggs/
+*.egg-info/
+
+# Environment
+.env
+*.env
+env/
+venv/
+.conda/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SLURM
+slurm-*.out
+
+# Results (keep structure, ignore large outputs)
+results/*.npy
+results/*.npz
