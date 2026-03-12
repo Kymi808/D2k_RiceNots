@@ -15,6 +15,9 @@
 #SBATCH --error=logs/train_%j.err
 #SBATCH --mail-type=END,FAIL
 
+# NOTE: 'logs/' directory must exist BEFORE submitting this job.
+#       Run: mkdir -p logs
+
 # --- Setup ---
 echo "============================================"
 echo "Job ID: $SLURM_JOB_ID"
@@ -29,8 +32,11 @@ mkdir -p logs results checkpoints
 module purge
 module load Miniforge3/24.1.2-0
 
-# Activate conda environment (create with setup_env.sh first)
-source activate mamba-cfd 2>/dev/null || conda activate mamba-cfd
+# Use conda env's Python and add pip --target packages to path
+PROJECT_DIR=/projects/dsci435/NASA_REENTRY_SP26
+ENV_DIR=$PROJECT_DIR/.conda/envs/mamba-cfd
+export PATH=$ENV_DIR/bin:$PATH
+export PYTHONPATH=$ENV_DIR/lib/python3.11/site-packages:$PYTHONPATH
 
 # Verify GPU access
 python -c "
@@ -39,7 +45,7 @@ print(f'PyTorch: {torch.__version__}')
 print(f'CUDA available: {torch.cuda.is_available()}')
 print(f'GPU count: {torch.cuda.device_count()}')
 for i in range(torch.cuda.device_count()):
-    print(f'  GPU {i}: {torch.cuda.get_device_name(i)} ({torch.cuda.get_device_properties(i).total_mem / 1e9:.1f} GB)')
+    print(f'  GPU {i}: {torch.cuda.get_device_name(i)} ({torch.cuda.get_device_properties(i).total_memory / 1e9:.1f} GB)')
 "
 
 # --- Training ---
@@ -51,7 +57,7 @@ torchrun \
     --nproc_per_node=4 \
     --master_port=29500 \
     train.py \
-    --data apollo_cfd_database.csv \
+    --data data/apollo_cfd_database.csv \
     --save_dir results \
     --checkpoint_dir checkpoints
 

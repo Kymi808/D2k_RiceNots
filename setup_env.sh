@@ -1,28 +1,36 @@
 #!/bin/bash
 # ============================================================
 # Setup conda environment on Rice NOTS cluster
-# Run this ONCE before submitting SLURM jobs:
-#   bash setup_env.sh
+# Installs to project directory to avoid home quota issues
+# Run: bash setup_env.sh
 # ============================================================
+
+PROJECT_DIR=/projects/dsci435/NASA_REENTRY_SP26
 
 module purge
 module load Miniforge3/24.1.2-0
 
-# Create environment
-conda create -n mamba-cfd python=3.11 -y
-conda activate mamba-cfd
+# Put conda envs and pip cache under project dir
+export CONDA_ENVS_PATH=$PROJECT_DIR/.conda/envs
+export CONDA_PKGS_DIRS=$PROJECT_DIR/.conda/pkgs
+export PIP_CACHE_DIR=$PROJECT_DIR/.pip_cache
+export PIP_TARGET=$PROJECT_DIR/.conda/envs/mamba-cfd/lib/python3.11/site-packages
+mkdir -p $CONDA_ENVS_PATH $CONDA_PKGS_DIRS $PIP_CACHE_DIR
 
-# PyTorch with CUDA (check available CUDA version with: module spider CUDA)
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# Create environment in project dir
+conda create -p $PROJECT_DIR/.conda/envs/mamba-cfd python=3.11 -y
+conda activate $PROJECT_DIR/.conda/envs/mamba-cfd
 
-# Dependencies
-pip install numpy pandas scikit-learn matplotlib
+# Install into the conda env directly (not ~/.local)
+pip install --target=$PIP_TARGET --no-cache-dir \
+    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+pip install --target=$PIP_TARGET --no-cache-dir \
+    numpy pandas scikit-learn matplotlib
 
 echo ""
 echo "Environment setup complete."
-echo "Activate with: conda activate mamba-cfd"
 echo ""
-echo "Before submitting jobs, verify GPU access:"
-echo "  srun --partition=commons --gres=gpu:lovelace:1 --time=00:05:00 --pty bash"
-echo "  conda activate mamba-cfd"
-echo "  python -c 'import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))'"
+echo "To activate:"
+echo "  module load Miniforge3/24.1.2-0"
+echo "  conda activate $PROJECT_DIR/.conda/envs/mamba-cfd"

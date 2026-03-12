@@ -42,7 +42,7 @@ class Config:
 
     # --- Loss weights ---
     # Data loss weights (qw prioritized 3x)
-    w_qw: float = 3.0
+    w_qw: float = 2.0
     w_pw: float = 1.0
     w_tw: float = 1.0
     w_me: float = 1.0

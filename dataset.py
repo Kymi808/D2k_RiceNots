@@ -185,23 +185,54 @@ class CFDPartitionDataset(Dataset):
         return self.X[idx], self.Y[idx]
 
 
+def _load_and_clean_quiet(cfg: Config, file_path: str):
+    """Same as load_and_clean but without print statements (for non-main ranks)."""
+    df_raw = pd.read_csv(file_path)
+    n_rows = len(df_raw)
+    assert n_rows % cfg.points_per_solution == 0
+    df_raw = df_raw.copy()
+    df_raw["location_id"] = (np.arange(n_rows) // cfg.points_per_solution).astype(np.int32)
+    unique_locs = df_raw["location_id"].unique()
+    rng = np.random.RandomState(123)
+    rng.shuffle(unique_locs)
+    n = len(unique_locs)
+    n_train = int(round(cfg.train_frac * n))
+    n_val = int(round(cfg.val_frac * n))
+    split_map = {}
+    for lid in unique_locs[:n_train]:
+        split_map[lid] = "train"
+    for lid in unique_locs[n_train:n_train + n_val]:
+        split_map[lid] = "val"
+    for lid in unique_locs[n_train + n_val:]:
+        split_map[lid] = "test"
+    df_raw["split"] = df_raw["location_id"].map(split_map)
+    df_clean = df_raw.copy()
+    df_clean = df_clean[df_clean['theta (m)'] >= 0]
+    df_clean = df_clean[df_clean['Re-theta'] >= 1e-5]
+    df_clean = df_clean[(df_clean['qw (W/m^2)'] >= 1e3) & (df_clean['qw (W/m^2)'] <= 1e7)]
+    return df_clean
+
+
 def get_dataloaders(cfg: Config, file_path: str, distributed=False, rank=0, world_size=1):
     """
     Full pipeline: load → clean → partition → scale → dataloaders.
     Returns (train_dl, val_dl, test_dl, scaler_X, scaler_y, test_raw_feats, test_raw_targs).
     """
-    df = load_and_clean(cfg, file_path)
+    verbose = (rank == 0)
+    df = load_and_clean(cfg, file_path) if verbose else _load_and_clean_quiet(cfg, file_path)
 
     # Build partitioned datasets for train/val
-    print("Building partitioned datasets...")
+    if verbose:
+        print("Building partitioned datasets...")
     X_train_raw, Y_train_raw, meta_train = build_partition_dataset(df, 'train', cfg)
     X_val_raw, Y_val_raw, meta_val = build_partition_dataset(df, 'val', cfg)
     X_test_raw, Y_test_raw, meta_test = build_partition_dataset(df, 'test', cfg)
 
-    print(f"Train partitions: {X_train_raw.shape}")
-    print(f"Val partitions:   {X_val_raw.shape}")
-    print(f"Test partitions:  {X_test_raw.shape}")
-    print(f"Partitions per solution: {cfg.n_partitions}")
+    if verbose:
+        print(f"Train partitions: {X_train_raw.shape}")
+        print(f"Val partitions:   {X_val_raw.shape}")
+        print(f"Test partitions:  {X_test_raw.shape}")
+        print(f"Partitions per solution: {cfg.n_partitions}")
 
     # Fit scalers on training data
     scaler_X, scaler_y = fit_scalers(X_train_raw, Y_train_raw, cfg)

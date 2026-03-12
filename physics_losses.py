@@ -33,6 +33,8 @@ class PhysicsLoss(nn.Module):
         """Convert standardized log10 prediction back to physical units."""
         idx = self.idx_map[name]
         log_val = pred_std * self.y_std[idx] + self.y_mean[idx]
+        # Clamp to prevent overflow (10^20 is already way beyond physical range)
+        log_val = torch.clamp(log_val, min=-10.0, max=20.0)
         return torch.pow(10.0, log_val)
 
     def _get_freestream(self, X_batch, scaler_X):
@@ -77,7 +79,8 @@ class PhysicsLoss(nn.Module):
         if has('qw') and has('tw'):
             qw_phys = self._to_physical(preds['qw'], 'qw')
             tw_phys = self._to_physical(preds['tw'], 'tw')
-            log_ratio = torch.log10(qw_phys / (tw_phys + 1e-8) + 1e-8)
+            ratio = (qw_phys + 1e-8) / (tw_phys + 1e-8)
+            log_ratio = torch.log10(ratio.clamp(min=1e-8))
 
             # Ratio should be in [10^2.5, 10^6.7] for Apollo reentry
             bound_loss = (
@@ -114,8 +117,8 @@ class PhysicsLoss(nn.Module):
             qw_max = qw_phys.max(dim=1, keepdim=True).values  # (B, 1, 1)
             scaling = torch.sqrt(rho[:, :1, :].abs() + 1e-8) * V[:, :1, :].abs().pow(3)
 
-            log_qw_max = torch.log10(qw_max + 1e-8)
-            log_scaling = torch.log10(scaling + 1e-8)
+            log_qw_max = torch.log10(qw_max.clamp(min=1e-8))
+            log_scaling = torch.log10(scaling.clamp(min=1e-8))
             log_ratio = log_qw_max - log_scaling
             # Variance across batch — should be small if scaling holds
             if log_ratio.shape[0] > 1:
@@ -127,7 +130,7 @@ class PhysicsLoss(nn.Module):
             tw_phys = self._to_physical(preds['tw'], 'tw')
             q_inf = freestream['q_inf']
             Cf = tw_phys / (q_inf + 1e-8)
-            log_Cf = torch.log10(Cf + 1e-10)
+            log_Cf = torch.log10(Cf.clamp(min=1e-10))
 
             losses['cf_bounds'] = (
                 F.relu(-5.0 - log_Cf).pow(2).mean() +  # Cf > 1e-5

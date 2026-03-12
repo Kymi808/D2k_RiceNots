@@ -148,7 +148,7 @@ def eval_epoch(model, dl, cfg, y_col_names, y_weights,
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=str, default='apollo_cfd_database.csv')
+    parser.add_argument('--data', type=str, default='data/apollo_cfd_database.csv')
     parser.add_argument('--epochs', type=int, default=None)
     parser.add_argument('--seq_len', type=int, default=None)
     parser.add_argument('--batch_size', type=int, default=None)
@@ -215,11 +215,20 @@ def main():
         print(f"  Epochs: {cfg.epochs}, LR: {cfg.lr}")
         print()
 
-    # Data
+    # Data — all ranks load data (each gets own DataLoader with DistributedSampler)
+    if is_main(rank):
+        print("Loading data...")
     (train_dl, val_dl, test_dl, scaler_X, scaler_y,
      Y_test_raw, meta_test, train_sampler) = get_dataloaders(
         cfg, args.data, distributed=distributed, rank=rank, world_size=world_size
     )
+    # Non-distributed test loader for evaluation (rank 0 sees all test data)
+    if is_main(rank):
+        from dataset import get_dataloaders as _get_dl
+        (_, _, test_dl_eval, _, _,
+         Y_test_raw_eval, _, _) = _get_dl(
+            cfg, args.data, distributed=False, rank=0, world_size=1
+        )
 
     y_col_names = cfg.y_col_names
     y_weights = cfg.y_weights
@@ -332,17 +341,21 @@ def main():
     if is_main(rank):
         # Load best checkpoint on a fresh (non-compiled, non-DDP) model for eval
         eval_model = MambaAutoencoder(cfg).to(device)
-        eval_model.load_state_dict(
-            torch.load(os.path.join(args.checkpoint_dir, 'best_model.pt'),
-                       weights_only=True, map_location=device)
-        )
+        ckpt = torch.load(os.path.join(args.checkpoint_dir, 'best_model.pt'),
+                          weights_only=True, map_location=device)
+        # Handle potential _orig_mod. prefix from torch.compile state_dict
+        cleaned_ckpt = {}
+        for k, v in ckpt.items():
+            cleaned_ckpt[k.replace('_orig_mod.', '')] = v
+        eval_model.load_state_dict(cleaned_ckpt)
 
         print("\n" + "=" * 60)
         print("  EVALUATION ON TEST SET")
         print("=" * 60)
 
+        # Use non-distributed test loader so we evaluate on ALL test data
         test_results = evaluate_model(
-            eval_model, test_dl, scaler_y, y_col_names, Y_test_raw, device
+            eval_model, test_dl_eval, scaler_y, y_col_names, Y_test_raw_eval, device
         )
         print_results(test_results, y_col_names, cfg.block_type)
 
