@@ -33,6 +33,7 @@ ENV_DIR=$PROJECT_DIR/.conda/envs/mamba-cfd
 export PATH=$ENV_DIR/bin:$PATH
 export PYTHONPATH=$ENV_DIR/lib/python3.11/site-packages:$PYTHONPATH
 export OMP_NUM_THREADS=1
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 python -c "
 import torch

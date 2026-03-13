@@ -121,7 +121,7 @@ def train_epoch(model, dl, optimizer, scaler_amp, cfg, y_col_names, y_weights,
 
         scaler_amp.scale(loss).backward()
         scaler_amp.unscale_(optimizer)
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         scaler_amp.step(optimizer)
         scaler_amp.update()
 
@@ -273,7 +273,7 @@ def main():
 
     # torch.compile
     if not args.no_compile and torch.cuda.is_available():
-        model = torch.compile(model, mode="reduce-overhead")
+        model = torch.compile(model, mode="default")
         if is_main(rank):
             print("torch.compile applied")
 

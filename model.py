@@ -6,6 +6,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint
 
 
 # ============================================================
@@ -216,7 +217,7 @@ class MambaAutoencoder(nn.Module):
         if config.block_type in ('mamba2', 'mamba3'):
             use_rope = config.use_rope and config.block_type == 'mamba3'
             use_trap = config.use_trapezoidal and config.block_type == 'mamba3'
-            self.encoder = nn.Sequential(*[
+            self.encoder = nn.ModuleList([
                 MambaBlock(
                     d_model=d, d_state=config.d_state,
                     d_conv=config.d_conv, expand=config.expand,
@@ -224,7 +225,7 @@ class MambaAutoencoder(nn.Module):
                 ) for _ in range(config.n_layers)
             ])
         elif config.block_type == 'mlp':
-            self.encoder = nn.Sequential(*[
+            self.encoder = nn.ModuleList([
                 MLPBlock(d_model=d, expand=config.expand)
                 for _ in range(config.n_layers)
             ])
@@ -251,7 +252,11 @@ class MambaAutoencoder(nn.Module):
 
     def forward(self, x):
         h = self.input_proj(x)
-        h = self.encoder(h)
+        for layer in self.encoder:
+            if self.training:
+                h = checkpoint(layer, h, use_reentrant=False)
+            else:
+                h = layer(h)
         z = self.to_latent(h)
 
         out = {'recon': self.recon_head(z), 'latent': z}
