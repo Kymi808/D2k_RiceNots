@@ -273,6 +273,8 @@ def main():
 
     # torch.compile
     if not args.no_compile and torch.cuda.is_available():
+        if distributed:
+            torch._dynamo.config.optimize_ddp = False
         model = torch.compile(model, mode="default")
         if is_main(rank):
             print("torch.compile applied")
