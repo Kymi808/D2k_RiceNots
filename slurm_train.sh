@@ -63,7 +63,8 @@ torchrun \
     train.py \
     --data data/apollo_cfd_database.csv \
     --save_dir $RUN_DIR \
-    --checkpoint_dir $CKPT_DIR
+    --checkpoint_dir $CKPT_DIR \
+    --no_compile
 
 echo ""
 echo "============================================"
