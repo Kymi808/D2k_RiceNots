@@ -95,14 +95,16 @@ def compute_loss(out, X_batch, Y_batch, cfg, y_col_names, y_weights,
 # ============================================================
 
 def train_epoch(model, dl, optimizer, scaler_amp, cfg, y_col_names, y_weights,
-                physics_loss_fn, scaler_X, device, use_amp, epoch=1):
+                physics_loss_fn, scaler_X, device, use_amp, epoch=1,
+                accum_steps=4):
     model.train()
     epoch_losses = {}
     nan_batches = 0
     n_batches = 0
-    for X_batch, Y_batch in dl:
+    optimizer.zero_grad(set_to_none=True)
+
+    for step, (X_batch, Y_batch) in enumerate(dl):
         X_batch, Y_batch = X_batch.to(device), Y_batch.to(device)
-        optimizer.zero_grad(set_to_none=True)
 
         with torch.amp.autocast('cuda', enabled=use_amp):
             out = model(X_batch)
@@ -110,24 +112,29 @@ def train_epoch(model, dl, optimizer, scaler_amp, cfg, y_col_names, y_weights,
                 out, X_batch, Y_batch, cfg, y_col_names, y_weights,
                 physics_loss_fn, scaler_X, epoch=epoch
             )
+            loss = loss / accum_steps  # scale for accumulation
 
-        # NaN guard: skip batch if loss is NaN/Inf
-        if not torch.isfinite(loss):
+        # NaN guard: let NaN backward run to keep DDP allreduce in sync
+        # GradScaler detects NaN gradients and skips the optimizer step
+        is_nan_batch = not torch.isfinite(loss)
+        if is_nan_batch:
             nan_batches += 1
-            optimizer.zero_grad(set_to_none=True)
             if nan_batches > max(5, len(dl) // 2):
                 raise RuntimeError(f"Too many NaN batches ({nan_batches}), halting training")
-            continue
 
         scaler_amp.scale(loss).backward()
-        scaler_amp.unscale_(optimizer)
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-        scaler_amp.step(optimizer)
-        scaler_amp.update()
 
-        n_batches += 1
-        for k, v in loss_dict.items():
-            epoch_losses[k] = epoch_losses.get(k, 0) + v
+        if (step + 1) % accum_steps == 0 or (step + 1) == len(dl):
+            scaler_amp.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            scaler_amp.step(optimizer)
+            scaler_amp.update()
+            optimizer.zero_grad(set_to_none=True)
+
+        if not is_nan_batch:
+            n_batches += 1
+            for k, v in loss_dict.items():
+                epoch_losses[k] = epoch_losses.get(k, 0) + v
 
     n = max(1, n_batches)
     return {k: v / n for k, v in epoch_losses.items()}
@@ -288,6 +295,7 @@ def main():
 
     # Optimizer & scheduler
     optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
+    warmup_epochs = 5
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', factor=0.5, patience=10, min_lr=1e-6
     )
@@ -320,6 +328,12 @@ def main():
         if distributed and train_sampler is not None:
             train_sampler.set_epoch(epoch)
 
+        # LR warmup: linear ramp for first few epochs
+        if epoch <= warmup_epochs:
+            warmup_lr = cfg.lr * epoch / warmup_epochs
+            for pg in optimizer.param_groups:
+                pg['lr'] = warmup_lr
+
         t0 = time.time()
         train_losses = train_epoch(
             model, train_dl, optimizer, scaler_amp, cfg,
@@ -332,6 +346,12 @@ def main():
         )
         elapsed = time.time() - t0
 
+        # Sync val loss across ranks so scheduler/patience stay consistent
+        if distributed:
+            val_total_t = torch.tensor(val_losses['total'], device=device)
+            dist.all_reduce(val_total_t, op=dist.ReduceOp.SUM)
+            val_losses['total'] = val_total_t.item() / world_size
+
         history['train_loss'].append(train_losses['total'])
         history['val_loss'].append(val_losses['total'])
         for name in y_col_names:
@@ -339,7 +359,8 @@ def main():
             if key in history:
                 history[key].append(val_losses.get(f'{name}_mse', 0))
 
-        scheduler.step(val_losses['total'])
+        if epoch > warmup_epochs:
+            scheduler.step(val_losses['total'])
         lr = optimizer.param_groups[0]['lr']
 
         # Save best
@@ -369,6 +390,10 @@ def main():
     total_time = time.time() - t_start
     if is_main(rank):
         print(f"\nTraining complete in {total_time / 60:.1f} minutes. Best val loss: {best_val_loss:.4f}")
+
+    # Sync all ranks before rank 0 enters evaluation
+    if distributed:
+        dist.barrier()
 
     # === Load Best & Evaluate ===
     if is_main(rank):
