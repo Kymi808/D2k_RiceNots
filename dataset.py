@@ -67,7 +67,7 @@ def load_and_clean(cfg: Config, file_path: str):
 
     # Random split by solution
     unique_locs = df_raw["location_id"].unique()
-    rng = np.random.RandomState(123)
+    rng = np.random.RandomState(cfg.split_seed)
     rng.shuffle(unique_locs)
     n = len(unique_locs)
     n_train = int(round(cfg.train_frac * n))
@@ -193,7 +193,7 @@ def _load_and_clean_quiet(cfg: Config, file_path: str):
     df_raw = df_raw.copy()
     df_raw["location_id"] = (np.arange(n_rows) // cfg.points_per_solution).astype(np.int32)
     unique_locs = df_raw["location_id"].unique()
-    rng = np.random.RandomState(123)
+    rng = np.random.RandomState(cfg.split_seed)
     rng.shuffle(unique_locs)
     n = len(unique_locs)
     n_train = int(round(cfg.train_frac * n))

@@ -182,6 +182,7 @@ def parse_args():
     parser.add_argument('--w_qw', type=float, default=None, help='Override qw loss weight')
     parser.add_argument('--train_frac', type=float, default=None, help='Training split fraction')
     parser.add_argument('--val_frac', type=float, default=None, help='Validation split fraction')
+    parser.add_argument('--split_seed', type=int, default=None, help='Random seed for train/val/test split')
     parser.add_argument('--save_dir', type=str, default='results')
     parser.add_argument('--checkpoint_dir', type=str, default='checkpoints')
     return parser.parse_args()
@@ -225,6 +226,8 @@ def main():
         cfg.train_frac = args.train_frac
     if args.val_frac is not None:
         cfg.val_frac = args.val_frac
+    if args.split_seed is not None:
+        cfg.split_seed = args.split_seed
 
     # Experiment flags
     if args.w_qw is not None:

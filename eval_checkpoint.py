@@ -20,6 +20,7 @@ def main():
     parser.add_argument('--qw_only', action='store_true')
     parser.add_argument('--train_frac', type=float, default=None)
     parser.add_argument('--val_frac', type=float, default=None)
+    parser.add_argument('--split_seed', type=int, default=None)
     args = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -33,6 +34,8 @@ def main():
         cfg.train_frac = args.train_frac
     if args.val_frac is not None:
         cfg.val_frac = args.val_frac
+    if args.split_seed is not None:
+        cfg.split_seed = args.split_seed
     if args.qw_only:
         cfg.predict_pw = False
         cfg.predict_tw = False

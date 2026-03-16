@@ -66,6 +66,9 @@ class Config:
     epochs: int = 300
     patience: int = 25
 
+    # --- Data split ---
+    split_seed: int = 123
+
     # --- Cluster ---
     num_gpus: int = 4
     num_workers: int = 4                # dataloader workers per GPU
