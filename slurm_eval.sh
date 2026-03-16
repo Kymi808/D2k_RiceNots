@@ -37,7 +37,7 @@ ENV_DIR=$PROJECT_DIR/.conda/envs/mamba-cfd
 export PATH=$ENV_DIR/bin:$PATH
 export PYTHONPATH=$ENV_DIR/lib/python3.11/site-packages:$PYTHONPATH
 
-$ENV_DIR/bin/python eval_checkpoint.py \
+torchrun --nproc_per_node=1 eval_checkpoint.py \
     --checkpoint $CKPT \
     --data data/apollo_cfd_database.csv \
     $EXTRA_ARGS
