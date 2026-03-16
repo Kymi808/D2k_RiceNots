@@ -180,6 +180,8 @@ def parse_args():
     parser.add_argument('--no_physics', action='store_true', help='Disable all physics losses')
     parser.add_argument('--qw_only', action='store_true', help='Only predict qw (disable other heads)')
     parser.add_argument('--w_qw', type=float, default=None, help='Override qw loss weight')
+    parser.add_argument('--train_frac', type=float, default=None, help='Training split fraction')
+    parser.add_argument('--val_frac', type=float, default=None, help='Validation split fraction')
     parser.add_argument('--save_dir', type=str, default='results')
     parser.add_argument('--checkpoint_dir', type=str, default='checkpoints')
     return parser.parse_args()
@@ -217,6 +219,12 @@ def main():
         cfg.latent_dim = args.latent_dim
     if args.block_type is not None:
         cfg.block_type = args.block_type
+
+    # Split overrides
+    if args.train_frac is not None:
+        cfg.train_frac = args.train_frac
+    if args.val_frac is not None:
+        cfg.val_frac = args.val_frac
 
     # Experiment flags
     if args.w_qw is not None:
