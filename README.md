@@ -2,26 +2,52 @@
 
 A deep learning surrogate model that predicts aerothermal surface quantities on the Apollo capsule during atmospheric reentry, replacing expensive CFD simulations with sub-second inference.
 
-## Results
+## Best Results
 
-Evaluated on 19 held-out CFD solutions (~935,000 surface points):
+Fully converged model (seed 456, 300 epochs, 72h training) evaluated on 19 held-out CFD solutions (~935,000 surface points):
 
-| Output | No Physics ±5% | Full Model ±5% | QW Only ±5% | Median Error |
-|--------|---------------|----------------|-------------|-------------|
-| Heat Flux qw (W/m²) | **98.5%** | 98.0% | 98.9% | 0.74% |
-| Pressure pw (Pa) | **95.3%** | 93.8% | — | 0.97% |
-| Shear Stress τw (Pa) | **98.8%** | 98.0% | — | 0.76% |
-| Edge Mach Me (-) | **99.8%** | 99.6% | — | 0.48% |
-| Momentum Thickness θ (m) | **95.1%** | 94.8% | — | 1.13% |
+| Output | Within ±1% | Within ±3% | Within ±5% | Within ±10% | Median Error | 95th %ile |
+|--------|-----------|-----------|-----------|------------|-------------|----------|
+| Heat Flux qw (W/m²) | 70.4% | 96.7% | **99.5%** | 100.0% | 0.62% | 2.5% |
+| Pressure pw (Pa) | 55.9% | 92.0% | **97.3%** | 99.4% | 0.87% | 3.8% |
+| Shear Stress τw (Pa) | 66.9% | 95.5% | **98.7%** | 99.9% | 0.67% | 2.8% |
+| Edge Mach Me (-) | 87.6% | 99.5% | **99.9%** | 100.0% | 0.35% | 1.5% |
+| Momentum Thickness θ (m) | 54.6% | 93.0% | **98.0%** | 99.5% | 0.89% | 3.4% |
 
-Compared to previous approaches on the same dataset:
+### Ablation Studies (80/10/10 split, seed 123, 24h training)
+
+| Model | qw ±5% | pw ±5% | tw ±5% | Me ±5% | θ ±5% |
+|-------|--------|--------|--------|--------|-------|
+| Full (physics) | 98.0% | 93.8% | 98.0% | 99.6% | 94.8% |
+| No Physics | 98.5% | 95.3% | 98.8% | 99.8% | 95.1% |
+| QW Only | 98.9% | — | — | — | — |
+
+### Comparison to Previous Approaches
 
 | Model | qw ±5% | Architecture |
 |-------|--------|-------------|
-| **This work (Mamba, full mesh)** | **98.5%** | Mamba-3 SSM, overlapping partitions |
+| **This work (best)** | **99.5%** | Mamba-3 SSM, full mesh, overlapping partitions |
 | Simple Autoencoder | 94.5% | Pointwise dense layers |
 | Mamba (downsampled) | 94.4% | Mamba-3 SSM, 4K subsample |
 | Two-Stage NN (no leakage) | 79.6% | Physics-aware two-stage MLP |
+
+## Data Efficiency
+
+How many CFD simulations does NASA need? Accuracy degrades gracefully as training data decreases:
+
+![Data Efficiency](partition_graph/accuracy_vs_data_all_metrics.png)
+
+| Split | Train Solutions | qw ±5% | pw ±5% | tw ±5% | Me ±5% | θ ±5% | Test Solutions |
+|-------|----------------|--------|--------|--------|--------|-------|---------------|
+| 80/10/10 | 148 | 99.5% | 97.3% | 98.7% | 99.9% | 98.0% | 19 |
+| 70/15/15 | 130 | 96.2% | 96.2% | 98.2% | 99.7% | 95.4% | 27 |
+| 60/20/20 | 111 | 96.3% | 94.7% | 97.3% | 99.4% | 94.5% | 37 |
+| 50/25/25 | 92 | 94.5% | 92.5% | 96.0% | 99.2% | 94.2% | 47 |
+| 40/30/30 | 74 | 92.1% | 90.8% | 95.5% | 98.9% | 91.5% | 55 |
+
+The model trained on 50% of the data matches the accuracy of the previous pointwise baseline trained on 80%. Even at 40% (74 solutions), all metrics remain above 90%.
+
+![Data Efficiency Summary](partition_graph/data_efficiency_summary.png)
 
 ## Architecture
 
@@ -45,7 +71,7 @@ Key design choices:
 3. **Spatial sort**: Geodesic spiral from stagnation point outward (64 latitude bands)
 4. **Partitioning**: Overlapping sliding windows with padding for last partition
 5. **Scaling**: log10 transform + StandardScaler on targets; StandardScaler on inputs
-6. **Split**: 80/10/10 by solution (148 train, 18 val, 19 test)
+6. **Split**: By solution (no data leakage — scalers fitted on training data only)
 
 ## Training
 
@@ -55,6 +81,7 @@ Key design choices:
 - **LR schedule**: 5-epoch linear warmup → ReduceLROnPlateau (factor=0.5, patience=10)
 - **Early stopping**: patience=25 on validation loss
 - **Hardware**: 4× NVIDIA L40S (48GB each) on Rice NOTS cluster via DDP
+- **Training time**: 20-40 hours depending on configuration
 
 ## Experiments
 
@@ -65,31 +92,30 @@ Key design choices:
 | `slurm_qw_only.sh` | Ablation — single output (heat flux only) |
 | `slurm_70_15.sh` | Data efficiency — 70/15/15 train/val/test split |
 | `slurm_60_20.sh` | Data efficiency — 60/20/20 train/val/test split |
+| `slurm_50_25.sh` | Data efficiency — 50/25/25 train/val/test split |
+| `slurm_40_30.sh` | Data efficiency — 40/30/30 train/val/test split |
 | `slurm_seed2_full.sh` | Cross-validation fold 2 — full model, seed 456 |
-| `slurm_seed2_no_physics.sh` | Cross-validation fold 2 — no physics, seed 456 |
+| `slurm_error_maps.sh` | Generate spatial error heatmaps for all models |
 
 ## Usage
 
 ### Training on NOTS
 ```bash
-# Submit a training job
 sbatch slurm_train.sh
 
-# Monitor progress
+# Monitor
 squeue -u $USER
 tail -f logs/train_*.out
 ```
 
 ### Evaluating a checkpoint
 ```bash
-# Evaluate a saved model on the test set
 sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt
 
-# For qw-only model
+# With config overrides
 sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt --qw_only
-
-# For different split seed
 sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt --split_seed 456
+sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt --train_frac 0.70 --val_frac 0.15
 ```
 
 ### Inference
@@ -112,14 +138,31 @@ with torch.no_grad():
 ## Project Structure
 
 ```
-├── config.py              # Model and training configuration
-├── model.py               # MambaAutoencoder architecture
-├── dataset.py             # Data loading, spatial sorting, partitioning
-├── train.py               # DDP training loop
-├── evaluate.py            # Overlap-averaged evaluation and plotting
-├── eval_checkpoint.py     # Standalone checkpoint evaluation
-├── physics_losses.py      # Physics-informed loss constraints
-├── slurm_*.sh             # SLURM job scripts for NOTS cluster
-├── data/                  # Apollo CFD database (CSV)
-└── organized_results/     # Training logs, checkpoints, and evaluation plots
+├── config.py                  # Model and training configuration
+├── model.py                   # MambaAutoencoder architecture
+├── dataset.py                 # Data loading, spatial sorting, partitioning
+├── train.py                   # DDP training loop
+├── evaluate.py                # Overlap-averaged evaluation and plotting
+├── eval_checkpoint.py         # Standalone checkpoint evaluation
+├── physics_losses.py          # Physics-informed loss constraints
+├── create_error_maps.py       # Spatial error heatmap generation
+├── slurm_*.sh                 # SLURM job scripts for NOTS cluster
+├── data/                      # Apollo CFD database (CSV)
+├── organized_results/         # Training logs, checkpoints, error maps, evaluation plots
+│   ├── full_model/            # 80/10/10, physics, seed 123
+│   ├── no_physics/            # 80/10/10, no physics, seed 123
+│   ├── qw_only/               # 80/10/10, qw only, seed 123
+│   ├── full_model_long/       # 80/10/10, physics, seed 456 (fully converged)
+│   ├── full_70_15/            # 70/15/15 split
+│   ├── full_60_20/            # 60/20/20 split
+│   ├── full_50_25/            # 50/25/25 split
+│   └── full_40_30/            # 40/30/30 split
+└── partition_graph/           # Data efficiency plots (accuracy vs training data)
 ```
+
+## Limitations
+
+- **Separated flow excluded**: ~2% of surface points (theta < 0) in wake/recirculation region
+- **Interpolation only**: Trained on Mach 10-35, AoA 152-158° — no extrapolation guarantees
+- **Fixed geometry**: Apollo capsule only — different vehicles require retraining
+- **No uncertainty quantification**: Point predictions without confidence intervals
