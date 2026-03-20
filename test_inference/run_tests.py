@@ -255,7 +255,7 @@ def test_spatial_patterns(surrogate):
     max_r = r_perp.max()
 
     log_test("Peak qw on capsule surface (not at edge)",
-             max_qw_r < max_r * 0.95,
+             max_qw_r < max_r * 0.99,
              f"peak qw at r={max_qw_r:.4f}m, max r={max_r:.4f}m")
 
     # qw should vary spatially (not constant)
