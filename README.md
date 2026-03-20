@@ -4,7 +4,7 @@ A deep learning surrogate model that predicts aerothermal surface quantities on 
 
 ## Best Results
 
-Fully converged model (seed 456, 300 epochs, 72h training) evaluated on 19 held-out CFD solutions (~935,000 surface points):
+Fully converged model (seed 456, 300 epochs, 40h training) evaluated on 19 held-out CFD solutions (~935,000 surface points):
 
 | Output | Within ±1% | Within ±3% | Within ±5% | Within ±10% | Median Error | 95th %ile |
 |--------|-----------|-----------|-----------|------------|-------------|----------|
@@ -48,6 +48,46 @@ How many CFD simulations does NASA need? Accuracy degrades gracefully as trainin
 The model trained on 50% of the data matches the accuracy of the previous pointwise baseline trained on 80%. Even at 40% (74 solutions), all metrics remain above 90%.
 
 ![Data Efficiency Summary](partition_graph/data_efficiency_summary.png)
+
+## Inference
+
+The packaged model predicts all 5 surface quantities for any flight condition in ~3.3 seconds on a single GPU. Inference test suite passes **71/71** checks covering loading, physical plausibility, monotonicity, determinism, spatial patterns, and performance.
+
+![Inference Surface Maps](test_inference/results/inference_surface_maps.png)
+
+![Velocity Sweep](test_inference/results/velocity_sweep.png)
+
+![Multi-Condition Comparison](test_inference/results/multi_condition_comparison.png)
+
+### Quick Start
+
+```bash
+# Package the trained model (one time)
+python package_model.py --checkpoint organized_results/full_model_long/best_model.pt \
+                        --output packaged_model/ --split_seed 456
+```
+
+```python
+from inference import MambaSurrogate
+
+# Load once (~3s)
+surrogate = MambaSurrogate('packaged_model/')
+
+# Predict for any flight condition (~3s per prediction)
+results = surrogate.predict(velocity=7500, density=0.003, aoa=155, dynamic_pressure=84375)
+
+qw = results['qw']      # (49698,) heat flux in W/m^2
+pw = results['pw']       # (49698,) pressure in Pa
+tw = results['tw']       # (49698,) shear stress in Pa
+me = results['me']       # (49698,) edge Mach number
+theta = results['theta'] # (49698,) momentum thickness in m
+xyz = results['xyz']     # (49698, 3) mesh coordinates for visualization
+
+# Sweep a trajectory
+for v in [4000, 6000, 8000, 10000]:
+    r = surrogate.predict(velocity=v, density=0.003, aoa=155, dynamic_pressure=0.5*0.003*v**2)
+    print(f"V={v}: max qw = {r['qw'].max():.0f} W/m^2")
+```
 
 ## Architecture
 
@@ -98,61 +138,6 @@ Key design choices:
 | `slurm_error_maps.sh` | Generate spatial error heatmaps for all models |
 | `slurm_package_and_test.sh` | Package best model and run inference tests |
 
-## Usage
-
-### Training on NOTS
-```bash
-sbatch slurm_train.sh
-
-# Monitor
-squeue -u $USER
-tail -f logs/train_*.out
-```
-
-### Evaluating a checkpoint
-```bash
-sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt
-
-# With config overrides
-sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt --qw_only
-sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt --split_seed 456
-sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt --train_frac 0.70 --val_frac 0.15
-```
-
-### Packaging and Inference
-```bash
-# Step 1: Package model (one time — saves weights, scalers, mesh)
-python package_model.py --checkpoint organized_results/full_model_long/best_model.pt \
-                        --output packaged_model/ --split_seed 456
-
-# Step 2: Use the packaged model
-python inference.py --model_dir packaged_model/ --velocity 7500 --density 0.003 --aoa 155
-```
-
-```python
-# Or use programmatically
-from inference import MambaSurrogate
-
-surrogate = MambaSurrogate('packaged_model/')
-results = surrogate.predict(velocity=7500, density=0.003, aoa=155, dynamic_pressure=84375)
-
-qw = results['qw']      # (N,) heat flux in W/m^2
-xyz = results['xyz']     # (N, 3) mesh coordinates
-
-# Sweep multiple conditions
-for v in [4000, 6000, 8000, 10000]:
-    r = surrogate.predict(velocity=v, density=0.003, aoa=155, dynamic_pressure=0.5*0.003*v**2)
-    print(f"V={v}: max qw = {r['qw'].max():.0f} W/m^2")
-```
-
-### Running Inference Tests
-```bash
-# On NOTS (packages model + runs full test suite)
-sbatch slurm_package_and_test.sh
-
-# Results saved to test_inference/results/
-```
-
 ## Project Structure
 
 ```
@@ -166,15 +151,23 @@ sbatch slurm_package_and_test.sh
 ├── create_error_maps.py       # Spatial error heatmap generation
 ├── package_model.py           # Package model for production deployment
 ├── inference.py               # Production inference wrapper (MambaSurrogate class)
+├── TECHNICAL_REFERENCE.md     # Comprehensive technical documentation
 ├── slurm_*.sh                 # SLURM job scripts for NOTS cluster
 ├── data/                      # Apollo CFD database (CSV)
 ├── packaged_model/            # Production-ready model (weights, scalers, mesh, config)
-├── test_inference/            # Inference test suite and results
+│   ├── model_weights.pt       # 244K trained parameters
+│   ├── scaler_X.pkl           # Input feature scaler
+│   ├── scaler_y.pkl           # Target scaler (log10 + standardized)
+│   ├── mesh_xyz_sorted.npy    # Pre-sorted capsule mesh (49,698 points)
+│   └── config.json            # Model configuration
+├── test_inference/            # Inference test suite (71/71 passing)
+│   ├── run_tests.py           # Test script
+│   └── results/               # Visualizations and test_summary.json
 ├── organized_results/         # Training logs, checkpoints, error maps, evaluation plots
 │   ├── full_model/            # 80/10/10, physics, seed 123
 │   ├── no_physics/            # 80/10/10, no physics, seed 123
 │   ├── qw_only/               # 80/10/10, qw only, seed 123
-│   ├── full_model_long/       # 80/10/10, physics, seed 456 (fully converged)
+│   ├── full_model_long/       # 80/10/10, physics, seed 456 (fully converged, best)
 │   ├── full_70_15/            # 70/15/15 split
 │   ├── full_60_20/            # 60/20/20 split
 │   ├── full_50_25/            # 50/25/25 split

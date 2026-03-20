@@ -560,8 +560,22 @@ sbatch slurm_package_and_test.sh
 
 **Speed comparison**:
 - Full CFD simulation: hours to days
-- Our surrogate model: seconds
+- Our surrogate model: ~3.3 seconds on a single L40S GPU
 - Cost: ~$0.001 per prediction vs ~$500-$5,000 per CFD run (estimated)
+
+### Inference Validation
+
+The inference test suite (`test_inference/run_tests.py`) passes **71/71** checks:
+
+| Category | Tests | What It Validates |
+|----------|-------|------------------|
+| Loading | 4 | Model loads, correct outputs, mesh size, partitions |
+| Single Prediction | 22 | Correct shapes, no NaN/Inf, all outputs present |
+| Physical Plausibility | 30 | All 5 conditions, all outputs within physical bounds |
+| Monotonicity | 2 | qw increases with velocity and density |
+| Determinism | 5 | Same input produces identical output |
+| Spatial Patterns | 3 | Heating concentrated and spatially varying |
+| Performance | 2 | Inference under 10s, benchmarked at 3.3s |
 
 ---
 
