@@ -97,29 +97,15 @@ After cleaning, each solution has ~49,200 points instead of 50,176. The model do
 
 ---
 
-## 3. Why Not Just Use a Regular Autoencoder?
+## 3. Why This Approach?
 
-### What the group's CVAE/VAE approach does
-
-The other approach compresses the full 50,176-point solution into a small latent vector (dimension ~4), then decodes it back to 50,176 points. The idea is:
-
-```
-50,176 points → Encoder → latent (dim 4) → Decoder → 50,176 points
-```
-
-**The problem**: Compressing 50,176 points into 4 numbers is an extreme bottleneck. The decoder must reconstruct ALL spatial detail from just 4 numbers. In practice, this tends to produce blurry, averaged predictions — the model memorizes rough patterns but can't capture the sharp local variations that matter for engineering accuracy.
-
-Think of it like compressing a 50-megapixel photo into 4 pixels, then trying to reconstruct the original. You can get the general colors right, but all detail is lost.
-
-### What our approach does differently
-
-We don't try to compress the entire solution into a tiny vector. Instead, we process the mesh as a **sequence** of points and make predictions **per point**, using local spatial context:
+Instead of compressing an entire 50,176-point solution into a small latent vector and decoding it back, we process the mesh as a **sequence** of points and make predictions **per point**, using local spatial context:
 
 ```
 8,192 points (one window) → Mamba Encoder → 8,192 predictions (one per point)
 ```
 
-Each point's prediction uses information from nearby points (spatial context) but doesn't need to reconstruct the entire solution from a bottleneck. This preserves local detail.
+Each point's prediction uses information from nearby points (spatial context). This preserves local detail that whole-solution compression tends to lose.
 
 We DO have a bottleneck (64→16 dims), but it exists per-point as a regularizer, not as a whole-solution compression. The actual predictions branch from the full 64-dim encoder output, bypassing the bottleneck.
 
@@ -129,7 +115,6 @@ We DO have a bottleneck (64→16 dims), but it exists per-point as a regularizer
 |----------|----------------|
 | Our Mamba approach | **99.5%** |
 | Simple pointwise autoencoder (baseline) | 94.5% |
-| CVAE/VAE (50K→4→50K) | Poor (the group's results) |
 
 ---
 
@@ -564,12 +549,6 @@ The original Mamba experiment from `Mamba_Autoencoder_CFD.ipynb`. Downsampled 50
 Predicts boundary layer properties first, then heat flux. No data leakage (doesn't use CFD outputs as inputs to predict other CFD outputs).
 
 **Our advantage**: End-to-end learning avoids error propagation between stages.
-
-### CVAE/VAE (50K→4→50K)
-
-Compresses entire solution to 4-dim latent, then decodes back. Tends to memorize rough patterns but can't capture fine spatial detail.
-
-**Our advantage**: Per-point predictions with spatial context instead of whole-solution compression.
 
 ---
 
