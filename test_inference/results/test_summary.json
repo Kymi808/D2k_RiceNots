@@ -1,0 +1,372 @@
+{
+  "tests_passed": 71,
+  "tests_failed": 0,
+  "tests_total": 71,
+  "avg_inference_time_s": 3.277703952789307,
+  "device": "cuda",
+  "n_mesh_points": 49698,
+  "outputs": [
+    "qw",
+    "pw",
+    "tw",
+    "me",
+    "theta"
+  ],
+  "details": [
+    {
+      "name": "Model loads without error",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Has expected outputs",
+      "status": "PASS",
+      "detail": "outputs: ['qw', 'pw', 'tw', 'me', 'theta']"
+    },
+    {
+      "name": "Mesh has expected point count",
+      "status": "PASS",
+      "detail": "n_points: 49698"
+    },
+    {
+      "name": "Partitions computed",
+      "status": "PASS",
+      "detail": "n_partitions: 8"
+    },
+    {
+      "name": "Prediction completes",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "Inference time reasonable",
+      "status": "PASS",
+      "detail": "3.49s"
+    },
+    {
+      "name": "qw in results",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "qw shape correct",
+      "status": "PASS",
+      "detail": "shape: (49698,)"
+    },
+    {
+      "name": "qw no NaN values",
+      "status": "PASS",
+      "detail": "NaN count: 0"
+    },
+    {
+      "name": "qw no Inf values",
+      "status": "PASS",
+      "detail": "Inf count: 0"
+    },
+    {
+      "name": "pw in results",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "pw shape correct",
+      "status": "PASS",
+      "detail": "shape: (49698,)"
+    },
+    {
+      "name": "pw no NaN values",
+      "status": "PASS",
+      "detail": "NaN count: 0"
+    },
+    {
+      "name": "pw no Inf values",
+      "status": "PASS",
+      "detail": "Inf count: 0"
+    },
+    {
+      "name": "tw in results",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "tw shape correct",
+      "status": "PASS",
+      "detail": "shape: (49698,)"
+    },
+    {
+      "name": "tw no NaN values",
+      "status": "PASS",
+      "detail": "NaN count: 0"
+    },
+    {
+      "name": "tw no Inf values",
+      "status": "PASS",
+      "detail": "Inf count: 0"
+    },
+    {
+      "name": "me in results",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "me shape correct",
+      "status": "PASS",
+      "detail": "shape: (49698,)"
+    },
+    {
+      "name": "me no NaN values",
+      "status": "PASS",
+      "detail": "NaN count: 0"
+    },
+    {
+      "name": "me no Inf values",
+      "status": "PASS",
+      "detail": "Inf count: 0"
+    },
+    {
+      "name": "theta in results",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "theta shape correct",
+      "status": "PASS",
+      "detail": "shape: (49698,)"
+    },
+    {
+      "name": "theta no NaN values",
+      "status": "PASS",
+      "detail": "NaN count: 0"
+    },
+    {
+      "name": "theta no Inf values",
+      "status": "PASS",
+      "detail": "Inf count: 0"
+    },
+    {
+      "name": "xyz in results",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "name": "xyz shape correct",
+      "status": "PASS",
+      "detail": "shape: (49698, 3)"
+    },
+    {
+      "name": "Low speed, high altitude: qw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e+02, 1e+07], range: [4.81e+03, 2.02e+05]"
+    },
+    {
+      "name": "Low speed, high altitude: pw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-01, 5e+05], range: [6.35e+00, 3.05e+03]"
+    },
+    {
+      "name": "Low speed, high altitude: tw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 1e+03], range: [5.88e-01, 4.18e+01]"
+    },
+    {
+      "name": "Low speed, high altitude: me mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 6e+00], range: [7.78e-02, 3.29e+00]"
+    },
+    {
+      "name": "Low speed, high altitude: theta mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-08, 1e-01], range: [4.67e-05, 1.19e-02]"
+    },
+    {
+      "name": "Low speed, high altitude: qw mean > 0",
+      "status": "PASS",
+      "detail": "mean qw: 44324 W/m^2"
+    },
+    {
+      "name": "Mid speed, mid altitude: qw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e+02, 1e+07], range: [2.63e+04, 5.44e+06]"
+    },
+    {
+      "name": "Mid speed, mid altitude: pw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-01, 5e+05], range: [1.30e+02, 1.79e+05]"
+    },
+    {
+      "name": "Mid speed, mid altitude: tw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 1e+03], range: [8.42e+00, 4.59e+02]"
+    },
+    {
+      "name": "Mid speed, mid altitude: me mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 6e+00], range: [2.91e-02, 3.18e+00]"
+    },
+    {
+      "name": "Mid speed, mid altitude: theta mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-08, 1e-01], range: [4.12e-04, 2.23e-03]"
+    },
+    {
+      "name": "Mid speed, mid altitude: qw mean > 0",
+      "status": "PASS",
+      "detail": "mean qw: 1862846 W/m^2"
+    },
+    {
+      "name": "High speed, low altitude: qw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e+02, 1e+07], range: [8.19e+04, 4.42e+06]"
+    },
+    {
+      "name": "High speed, low altitude: pw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-01, 5e+05], range: [2.02e+03, 1.15e+05]"
+    },
+    {
+      "name": "High speed, low altitude: tw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 1e+03], range: [2.16e+01, 3.71e+02]"
+    },
+    {
+      "name": "High speed, low altitude: me mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 6e+00], range: [4.84e-01, 1.90e+00]"
+    },
+    {
+      "name": "High speed, low altitude: theta mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-08, 1e-01], range: [5.29e-04, 2.66e-03]"
+    },
+    {
+      "name": "High speed, low altitude: qw mean > 0",
+      "status": "PASS",
+      "detail": "mean qw: 2734043 W/m^2"
+    },
+    {
+      "name": "Low AoA edge: qw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e+02, 1e+07], range: [1.16e+04, 2.13e+06]"
+    },
+    {
+      "name": "Low AoA edge: pw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-01, 5e+05], range: [5.27e+01, 7.37e+04]"
+    },
+    {
+      "name": "Low AoA edge: tw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 1e+03], range: [1.13e+00, 2.70e+02]"
+    },
+    {
+      "name": "Low AoA edge: me mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 6e+00], range: [1.59e-02, 3.46e+00]"
+    },
+    {
+      "name": "Low AoA edge: theta mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-08, 1e-01], range: [4.55e-05, 2.23e-03]"
+    },
+    {
+      "name": "Low AoA edge: qw mean > 0",
+      "status": "PASS",
+      "detail": "mean qw: 778368 W/m^2"
+    },
+    {
+      "name": "High AoA edge: qw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e+02, 1e+07], range: [7.06e+04, 5.97e+06]"
+    },
+    {
+      "name": "High AoA edge: pw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-01, 5e+05], range: [5.39e+02, 2.25e+05]"
+    },
+    {
+      "name": "High AoA edge: tw mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 1e+03], range: [2.38e+01, 4.95e+02]"
+    },
+    {
+      "name": "High AoA edge: me mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-03, 6e+00], range: [1.00e-01, 3.09e+00]"
+    },
+    {
+      "name": "High AoA edge: theta mostly in bounds",
+      "status": "PASS",
+      "detail": "100.0% in [1e-08, 1e-01], range: [3.82e-04, 2.48e-03]"
+    },
+    {
+      "name": "High AoA edge: qw mean > 0",
+      "status": "PASS",
+      "detail": "mean qw: 2349203 W/m^2"
+    },
+    {
+      "name": "qw increases with velocity (general trend)",
+      "status": "PASS",
+      "detail": "mean qw at V=[4000.0, 6000.0, 8000.0, 10000.0]: ['980320', '1401683', '2047898', '2951045']"
+    },
+    {
+      "name": "qw increases with density (fixed velocity, consistent q_inf)",
+      "status": "PASS",
+      "detail": "mean qw at rho=[0.0005, 0.001, 0.003, 0.006]: ['784178', '1101937', '1862846', '2074326']"
+    },
+    {
+      "name": "qw identical across runs",
+      "status": "PASS",
+      "detail": "max diff: 0.00e+00"
+    },
+    {
+      "name": "pw identical across runs",
+      "status": "PASS",
+      "detail": "max diff: 0.00e+00"
+    },
+    {
+      "name": "tw identical across runs",
+      "status": "PASS",
+      "detail": "max diff: 0.00e+00"
+    },
+    {
+      "name": "me identical across runs",
+      "status": "PASS",
+      "detail": "max diff: 0.00e+00"
+    },
+    {
+      "name": "theta identical across runs",
+      "status": "PASS",
+      "detail": "max diff: 0.00e+00"
+    },
+    {
+      "name": "Peak qw on capsule surface (not at edge)",
+      "status": "PASS",
+      "detail": "peak qw at r=1.8918m, max r=1.9558m"
+    },
+    {
+      "name": "qw has spatial variation (not constant)",
+      "status": "PASS",
+      "detail": "coefficient of variation: 0.51"
+    },
+    {
+      "name": "Peak qw concentrated (max >> mean)",
+      "status": "PASS",
+      "detail": "max/mean ratio: 2.9x"
+    },
+    {
+      "name": "pw has spatial variation",
+      "status": "PASS",
+      "detail": "coefficient of variation: 0.53"
+    },
+    {
+      "name": "Avg inference time (5 runs)",
+      "status": "PASS",
+      "detail": "3.278s +/- 0.000s"
+    },
+    {
+      "name": "Inference under 10s (CPU) or 2s (GPU)",
+      "status": "PASS",
+      "detail": "device: cuda"
+    }
+  ]
+}
