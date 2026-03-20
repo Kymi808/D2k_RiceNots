@@ -1,0 +1,58 @@
+{
+  "n_features": 7,
+  "d_model": 64,
+  "d_state": 64,
+  "d_conv": 4,
+  "n_layers": 4,
+  "latent_dim": 16,
+  "expand": 2,
+  "block_type": "mamba3",
+  "use_rope": true,
+  "use_trapezoidal": true,
+  "seq_len": 8192,
+  "partition_stride": 6400,
+  "points_per_solution": 50176,
+  "y_col_names": [
+    "qw",
+    "pw",
+    "tw",
+    "me",
+    "theta"
+  ],
+  "target_config": [
+    [
+      "qw",
+      "qw (W/m^2)",
+      3.0
+    ],
+    [
+      "pw",
+      "pw (Pa)",
+      1.0
+    ],
+    [
+      "tw",
+      "tauw (Pa)",
+      1.0
+    ],
+    [
+      "me",
+      "Me",
+      1.0
+    ],
+    [
+      "theta",
+      "theta (m)",
+      1.0
+    ]
+  ],
+  "x_cols": [
+    "X",
+    "Y",
+    "Z",
+    "velocity (m/s)",
+    "density (kg/m^3)",
+    "aoa (degrees)",
+    "dynamic_pressure (Pa)"
+  ]
+}

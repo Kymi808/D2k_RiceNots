@@ -499,28 +499,63 @@ The first training runs were cut off at 24 hours (~155 epochs) by the SLURM time
 
 ## 12. How Inference Works in Production
 
-Once trained, predicting for a new flight condition takes < 1 second:
+Once trained, predicting for a new flight condition is simple. The complexity (spatial sorting, partitioning, scaling, overlap averaging) is wrapped in the `MambaSurrogate` class.
+
+### Packaging (one time)
+
+```bash
+python package_model.py --checkpoint organized_results/full_model_long/best_model.pt \
+                        --output packaged_model/ --split_seed 456
+```
+
+This saves everything needed for inference into one directory:
+- `model_weights.pt` — trained neural network weights
+- `scaler_X.pkl` / `scaler_y.pkl` — fitted scalers (from training data)
+- `mesh_xyz_sorted.npy` — pre-sorted capsule mesh coordinates
+- `config.json` — model configuration
+
+### Using the Packaged Model
 
 ```python
-# Given: new flight condition
-velocity = 7500        # m/s
-density = 0.003        # kg/m³
-aoa = 155              # degrees
-q_inf = 84375          # Pa
+from inference import MambaSurrogate
 
-# Step 1: Build input array
-# The mesh XYZ coordinates are fixed (same capsule)
-# Replicate freestream conditions across all 50,176 points
-input = [X, Y, Z, velocity, density, aoa, q_inf]  # per point
+# Load once (takes a few seconds)
+surrogate = MambaSurrogate('packaged_model/')
 
-# Step 2: Spatial sort (geodesic spiral)
-# Step 3: Partition into 8 overlapping windows
-# Step 4: Scale with saved scaler
-# Step 5: Forward pass through model (8 partitions × ~ms each)
-# Step 6: Inverse transform to physical units
-# Step 7: Overlap average to get one prediction per point
+# Predict for any flight condition (sub-second on GPU, seconds on CPU)
+results = surrogate.predict(
+    velocity=7500.0,          # m/s
+    density=0.003,            # kg/m^3
+    aoa=155.0,                # degrees
+    dynamic_pressure=84375.0  # Pa
+)
 
-# Output: 50,176 values for each of qw, pw, tw, Me, theta
+# Access results — all in physical units
+qw = results['qw']      # (N,) heat flux in W/m^2
+pw = results['pw']       # (N,) pressure in Pa
+tw = results['tw']       # (N,) shear stress in Pa
+me = results['me']       # (N,) edge Mach number
+theta = results['theta'] # (N,) momentum thickness in m
+xyz = results['xyz']     # (N, 3) mesh coordinates for visualization
+
+# Sweep multiple conditions
+for v in [4000, 6000, 8000, 10000]:
+    r = surrogate.predict(velocity=v, density=0.003, aoa=155,
+                         dynamic_pressure=0.5 * 0.003 * v**2)
+    print(f"V={v}: max qw = {r['qw'].max():.0f} W/m^2")
+```
+
+The user provides 4 numbers (flight condition) and gets back 5 arrays of surface quantities plus mesh coordinates. No knowledge of scalers, partitions, or overlap averaging required.
+
+### Running Inference Tests
+
+```bash
+# On NOTS: packages model + runs comprehensive test suite
+sbatch slurm_package_and_test.sh
+
+# Tests cover: loading, physical plausibility, monotonicity,
+# determinism, spatial patterns, performance benchmarks
+# Results saved to test_inference/results/
 ```
 
 **Speed comparison**:
@@ -581,6 +616,8 @@ These are important to understand and communicate honestly:
 | `evaluate.py` | Test evaluation with overlap averaging | `evaluate_model()`, `print_results()` |
 | `physics_losses.py` | Physics-informed loss constraints | `PhysicsLoss.forward()`, `compute_physics_loss()` |
 | `eval_checkpoint.py` | Standalone evaluation from a saved checkpoint | `main()` — loads model, runs eval |
+| `package_model.py` | Package model + scalers + mesh for deployment | Saves everything needed for inference |
+| `inference.py` | Production inference wrapper | `MambaSurrogate` class — predict() takes 4 numbers, returns 5 arrays |
 
 ### SLURM Scripts
 
@@ -598,6 +635,7 @@ All `slurm_*.sh` files are job scripts for the Rice NOTS cluster. They set up th
 |------|-------------|
 | `create_error_maps.py` | Generates spatial error heatmaps and truth-vs-prediction maps for all models |
 | `partition_graph/create_partition_graphs.py` | Generates data efficiency plots (accuracy vs training data) |
+| `test_inference/run_tests.py` | Comprehensive inference test suite (loading, plausibility, performance) |
 
 ### Organized Results
 
@@ -609,6 +647,13 @@ Each subfolder in `organized_results/` contains:
   - `error_map_*.png`: Red-white-green signed error on dark background
   - `truth_vs_pred_*.png`: Ground truth vs prediction side-by-side
   - `error_distribution.png`: Histogram of signed errors
+
+### Production Deployment
+
+| Directory | What It Contains |
+|-----------|-----------------|
+| `packaged_model/` | Everything needed for inference: model weights, scalers, sorted mesh, config |
+| `test_inference/results/` | Test suite output: pass/fail summary, visualizations, performance benchmarks |
 
 ---
 

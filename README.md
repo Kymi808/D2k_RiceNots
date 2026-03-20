@@ -96,6 +96,7 @@ Key design choices:
 | `slurm_40_30.sh` | Data efficiency — 40/30/30 train/val/test split |
 | `slurm_seed2_full.sh` | Cross-validation fold 2 — full model, seed 456 |
 | `slurm_error_maps.sh` | Generate spatial error heatmaps for all models |
+| `slurm_package_and_test.sh` | Package best model and run inference tests |
 
 ## Usage
 
@@ -118,21 +119,38 @@ sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt --split_seed 456
 sbatch slurm_eval.sh checkpoints/run_JOBID/best_model.pt --train_frac 0.70 --val_frac 0.15
 ```
 
-### Inference
+### Packaging and Inference
+```bash
+# Step 1: Package model (one time — saves weights, scalers, mesh)
+python package_model.py --checkpoint organized_results/full_model_long/best_model.pt \
+                        --output packaged_model/ --split_seed 456
+
+# Step 2: Use the packaged model
+python inference.py --model_dir packaged_model/ --velocity 7500 --density 0.003 --aoa 155
+```
+
 ```python
-import torch
-from config import Config
-from model import MambaAutoencoder
+# Or use programmatically
+from inference import MambaSurrogate
 
-cfg = Config()
-model = MambaAutoencoder(cfg)
-model.load_state_dict(torch.load('best_model.pt', weights_only=True))
-model.eval()
+surrogate = MambaSurrogate('packaged_model/')
+results = surrogate.predict(velocity=7500, density=0.003, aoa=155, dynamic_pressure=84375)
 
-# x: (1, 8192, 7) — one partition of scaled input features
-with torch.no_grad():
-    out = model(x)
-    qw_pred = out['qw']  # (1, 8192, 1) in standardized log10 space
+qw = results['qw']      # (N,) heat flux in W/m^2
+xyz = results['xyz']     # (N, 3) mesh coordinates
+
+# Sweep multiple conditions
+for v in [4000, 6000, 8000, 10000]:
+    r = surrogate.predict(velocity=v, density=0.003, aoa=155, dynamic_pressure=0.5*0.003*v**2)
+    print(f"V={v}: max qw = {r['qw'].max():.0f} W/m^2")
+```
+
+### Running Inference Tests
+```bash
+# On NOTS (packages model + runs full test suite)
+sbatch slurm_package_and_test.sh
+
+# Results saved to test_inference/results/
 ```
 
 ## Project Structure
@@ -146,8 +164,12 @@ with torch.no_grad():
 ├── eval_checkpoint.py         # Standalone checkpoint evaluation
 ├── physics_losses.py          # Physics-informed loss constraints
 ├── create_error_maps.py       # Spatial error heatmap generation
+├── package_model.py           # Package model for production deployment
+├── inference.py               # Production inference wrapper (MambaSurrogate class)
 ├── slurm_*.sh                 # SLURM job scripts for NOTS cluster
 ├── data/                      # Apollo CFD database (CSV)
+├── packaged_model/            # Production-ready model (weights, scalers, mesh, config)
+├── test_inference/            # Inference test suite and results
 ├── organized_results/         # Training logs, checkpoints, error maps, evaluation plots
 │   ├── full_model/            # 80/10/10, physics, seed 123
 │   ├── no_physics/            # 80/10/10, no physics, seed 123
