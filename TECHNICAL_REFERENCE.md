@@ -525,8 +525,8 @@ input = [X, Y, Z, velocity, density, aoa, q_inf]  # per point
 
 **Speed comparison**:
 - Full CFD simulation: hours to days
-- Our surrogate model: < 1 second
-- Cost: ~$0.001 per prediction vs $500-$5,000 per CFD run
+- Our surrogate model: seconds
+- Cost: ~$0.001 per prediction vs ~$500-$5,000 per CFD run (estimated)
 
 ---
 
@@ -628,7 +628,7 @@ Each subfolder in `organized_results/` contains:
 | **Mamba** | A selective state space model — a sequence model with linear memory and parallel computation |
 | **Mixed precision (AMP)** | Training with float16 for speed and float32 for accuracy where needed |
 | **NCCL** | NVIDIA Collective Communications Library — handles GPU-to-GPU communication |
-| **NOTS** | Rice University's HPC cluster (National Optical-Infrared Astronomy Research Laboratory of Timeshared Systems) |
+| **NOTS** | Rice University's HPC cluster (Night Owls Time-Sharing Service) |
 | **Overlap averaging** | Averaging predictions from multiple overlapping windows for the same physical point |
 | **Parallel scan** | Mathematical trick to compute linear recurrences in O(log L) parallel steps |
 | **Partition** | One 8,192-point window from a spatially-sorted solution |
