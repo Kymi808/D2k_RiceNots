@@ -180,6 +180,7 @@ def parse_args():
     parser.add_argument('--no_physics', action='store_true', help='Disable all physics losses')
     parser.add_argument('--qw_only', action='store_true', help='Only predict qw (disable other heads)')
     parser.add_argument('--w_qw', type=float, default=None, help='Override qw loss weight')
+    parser.add_argument('--physics_scale', type=float, default=None, help='Multiply all physics lambdas by this factor')
     parser.add_argument('--train_frac', type=float, default=None, help='Training split fraction')
     parser.add_argument('--val_frac', type=float, default=None, help='Validation split fraction')
     parser.add_argument('--split_seed', type=int, default=None, help='Random seed for train/val/test split')
@@ -244,6 +245,13 @@ def main():
         cfg.lambda_cf_bounds = 0.0
         cfg.lambda_bl_consistency = 0.0
         cfg.lambda_positivity = 0.0
+    if args.physics_scale is not None:
+        cfg.lambda_reynolds *= args.physics_scale
+        cfg.lambda_newtonian *= args.physics_scale
+        cfg.lambda_fay_riddell *= args.physics_scale
+        cfg.lambda_cf_bounds *= args.physics_scale
+        cfg.lambda_bl_consistency *= args.physics_scale
+        cfg.lambda_positivity *= args.physics_scale
 
     if is_main(rank):
         print(f"{'=' * 60}")
