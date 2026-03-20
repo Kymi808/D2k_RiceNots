@@ -321,7 +321,7 @@ def main():
                 param.data = param.data.clone()
         ckpt = torch.load(ckpt_path, weights_only=True, map_location=device)
         cleaned = {k.replace('_orig_mod.', ''): v for k, v in ckpt.items()}
-        model.load_state_dict(cleaned)
+        model.load_state_dict(cleaned, strict=False)
 
         # Run inference
         print(f"  Running inference on {X_test_s.shape[0]} test partitions...")
