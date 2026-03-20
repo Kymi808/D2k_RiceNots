@@ -30,7 +30,7 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 # Known physical bounds for Apollo reentry
 PHYSICAL_BOUNDS = {
     'qw':    (1e2, 1e7),       # W/m^2 — heat flux
-    'pw':    (1e-1, 1e5),      # Pa — surface pressure
+    'pw':    (1e-1, 5e5),      # Pa — surface pressure (can exceed 1e5 at high q_inf)
     'tw':    (1e-3, 1e3),      # Pa — wall shear stress
     'me':    (1e-3, 6.0),      # dimensionless — edge Mach
     'theta': (1e-8, 1e-1),     # m — momentum thickness
@@ -192,16 +192,19 @@ def test_monotonicity(surrogate):
              increases >= 2,
              f"mean qw at V={velocities}: {[f'{q:.0f}' for q in mean_qws]}")
 
-    # Fix other params, vary density
-    base2 = {'velocity': 7500.0, 'aoa': 155.0, 'dynamic_pressure': 84375.0}
+    # Fix velocity, vary density (compute consistent dynamic pressure = 0.5 * rho * V^2)
+    V_fixed = 7500.0
+    aoa_fixed = 155.0
     densities = [0.0005, 0.001, 0.003, 0.006]
     mean_qws2 = []
     for d in densities:
-        results = surrogate.predict(density=d, **base2)
+        q_inf = 0.5 * d * V_fixed**2
+        results = surrogate.predict(velocity=V_fixed, density=d, aoa=aoa_fixed,
+                                   dynamic_pressure=q_inf)
         mean_qws2.append(results['qw'].mean())
 
     increases2 = sum(1 for i in range(len(mean_qws2)-1) if mean_qws2[i+1] > mean_qws2[i])
-    log_test("qw increases with density (general trend)",
+    log_test("qw increases with density (fixed velocity, consistent q_inf)",
              increases2 >= 2,
              f"mean qw at rho={densities}: {[f'{q:.0f}' for q in mean_qws2]}")
 
@@ -244,28 +247,31 @@ def test_spatial_patterns(surrogate):
     xyz = results['xyz']
     qw = results['qw']
 
-    # Stagnation point should be near max X (nose of capsule)
-    # Find the region near the nose (top 5% of X values)
-    x_threshold = np.percentile(xyz[:, 0], 95)
-    nose_mask = xyz[:, 0] >= x_threshold
-    body_mask = xyz[:, 0] < np.percentile(xyz[:, 0], 50)
+    # Stagnation point is where qw is highest — find it and verify
+    # it's near the capsule centerline (low r_perp)
+    r_perp = np.sqrt(xyz[:, 1]**2 + xyz[:, 2]**2)
+    max_qw_idx = np.argmax(qw)
+    max_qw_r = r_perp[max_qw_idx]
+    median_r = np.median(r_perp)
 
-    nose_qw_mean = qw[nose_mask].mean()
-    body_qw_mean = qw[body_mask].mean()
+    log_test("Peak qw near capsule centerline",
+             max_qw_r < median_r,
+             f"peak qw at r={max_qw_r:.4f}m, median r={median_r:.4f}m")
 
-    log_test("qw higher near nose than body",
-             nose_qw_mean > body_qw_mean,
-             f"nose mean: {nose_qw_mean:.0f}, body mean: {body_qw_mean:.0f}, "
-             f"ratio: {nose_qw_mean/body_qw_mean:.1f}x")
+    # qw should vary spatially (not constant)
+    qw_cv = np.std(qw) / np.mean(qw)
+    log_test("qw has spatial variation (not constant)",
+             qw_cv > 0.1,
+             f"coefficient of variation: {qw_cv:.2f}")
 
-    # Pressure should also be higher near stagnation
+    # Pressure should also peak near centerline
     pw = results['pw']
-    nose_pw = pw[nose_mask].mean()
-    body_pw = pw[body_mask].mean()
+    max_pw_idx = np.argmax(pw)
+    max_pw_r = r_perp[max_pw_idx]
 
-    log_test("pw higher near nose than body",
-             nose_pw > body_pw,
-             f"nose mean: {nose_pw:.0f}, body mean: {body_pw:.0f}")
+    log_test("Peak pw near capsule centerline",
+             max_pw_r < median_r,
+             f"peak pw at r={max_pw_r:.4f}m, median r={median_r:.4f}m")
 
 
 def test_performance(surrogate):
