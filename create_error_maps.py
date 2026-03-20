@@ -1,10 +1,10 @@
 """
 Generate spatial error heatmaps on the Apollo capsule mesh.
-Color: red (under-predict) -> white (perfect) -> green (over-predict)
-Creates maps for each model in organized_results/ for each output metric.
+Error maps: red (under-predict) -> white (perfect) -> green (over-predict) on dark bg
+Ground truth maps: blue (low) -> red (high) on white bg
+Prediction maps: same colorscale as ground truth for direct comparison
 """
 import os
-import sys
 import numpy as np
 import torch
 import matplotlib
@@ -19,7 +19,6 @@ from dataset import (load_and_clean, build_partition_dataset,
 RESULTS_DIR = 'organized_results'
 DATA_PATH = 'data/apollo_cfd_database.csv'
 
-# Model configs: (folder, kwargs for Config overrides, extra flags)
 MODEL_CONFIGS = [
     ('full_model',      dict(),                                    dict()),
     ('no_physics',      dict(),                                    dict()),
@@ -31,9 +30,42 @@ MODEL_CONFIGS = [
     ('full_40_30',      dict(train_frac=0.40, val_frac=0.30),      dict()),
 ]
 
-# Custom red-white-green diverging colormap
+# Custom red-white-green diverging colormap (for error maps on dark bg)
 colors_rwg = ['#E53935', '#EF5350', '#FFCDD2', '#FFFFFF', '#C8E6C9', '#66BB6A', '#4CAF50']
 cmap_rwg = mcolors.LinearSegmentedColormap.from_list('RedWhiteGreen', colors_rwg, N=256)
+
+DARK_BG = '#1A1A2E'
+DARK_AXES = '#16213E'
+
+OUTPUT_LABELS = {
+    'qw': 'Heat Flux qw (W/m\u00b2)',
+    'pw': 'Pressure pw (Pa)',
+    'tw': 'Shear Stress \u03c4w (Pa)',
+    'me': 'Edge Mach Me',
+    'theta': 'Momentum Thickness \u03b8 (m)',
+}
+
+
+def style_ax_dark(ax):
+    """Style axis for dark background (error maps)."""
+    ax.set_facecolor(DARK_AXES)
+    ax.tick_params(colors='white', labelsize=8)
+    ax.xaxis.label.set_color('white')
+    ax.yaxis.label.set_color('white')
+    ax.title.set_color('white')
+    for spine in ax.spines.values():
+        spine.set_color('#444444')
+
+
+def style_ax_light(ax):
+    """Style axis for light background (ground truth / prediction maps)."""
+    ax.set_facecolor('#F8F8F8')
+    ax.tick_params(colors='#333333', labelsize=8)
+    ax.xaxis.label.set_color('#333333')
+    ax.yaxis.label.set_color('#333333')
+    ax.title.set_color('#222222')
+    for spine in ax.spines.values():
+        spine.set_color('#CCCCCC')
 
 
 def load_data_and_coords(cfg):
@@ -41,18 +73,14 @@ def load_data_and_coords(cfg):
     print(f"  Loading data (seed={cfg.split_seed}, train={cfg.train_frac})...")
     df = load_and_clean(cfg, DATA_PATH)
 
-    # Build partitioned datasets
     X_train_raw, Y_train_raw, _ = build_partition_dataset(df, 'train', cfg)
     X_test_raw, Y_test_raw, meta_test = build_partition_dataset(df, 'test', cfg)
 
-    # Fit scalers on training data
     scaler_X, scaler_y = fit_scalers(X_train_raw, Y_train_raw, cfg)
 
-    # Scale test data
     from dataset import apply_scalers
     X_test_s, Y_test_s = apply_scalers(X_test_raw, Y_test_raw, scaler_X, scaler_y, cfg)
 
-    # Get raw XYZ coords per test solution (pre-partition, pre-scale)
     df_test = df[df['split'] == 'test']
     loc_ids = sorted(df_test['location_id'].unique())
     solution_coords = {}
@@ -92,7 +120,6 @@ def run_model(model, X_test_s, device):
 
 def reconstruct_solutions(all_preds, Y_test_raw, meta_test, scaler_y, y_col_names):
     """Overlap-average predictions and compute signed relative errors per solution."""
-    # Inverse transform predictions
     pred_phys = {}
     for i, name in enumerate(y_col_names):
         if name not in all_preds:
@@ -101,7 +128,6 @@ def reconstruct_solutions(all_preds, Y_test_raw, meta_test, scaler_y, y_col_name
         pred_log = pred_std * scaler_y.scale_[i] + scaler_y.mean_[i]
         pred_phys[name] = np.power(10.0, pred_log)
 
-    # Group partitions by solution
     sol_parts = {}
     for pidx, m in enumerate(meta_test):
         lid = m['location_id']
@@ -109,7 +135,6 @@ def reconstruct_solutions(all_preds, Y_test_raw, meta_test, scaler_y, y_col_name
             sol_parts[lid] = []
         sol_parts[lid].append(pidx)
 
-    # Reconstruct per solution
     solution_errors = {}
     for lid, part_indices in sol_parts.items():
         n_pts = meta_test[part_indices[0]]['n_points_orig']
@@ -134,7 +159,6 @@ def reconstruct_solutions(all_preds, Y_test_raw, meta_test, scaler_y, y_col_name
             pred_avg = np.zeros(n_pts)
             pred_avg[mask] = pred_sum[mask] / pred_count[mask]
 
-            # Signed relative error: positive = over-predict, negative = under-predict
             signed_err = np.zeros(n_pts)
             signed_err[mask] = (pred_avg[mask] - true_vals[mask]) / (true_vals[mask] + 1e-9) * 100
 
@@ -150,28 +174,22 @@ def reconstruct_solutions(all_preds, Y_test_raw, meta_test, scaler_y, y_col_name
 
 def plot_error_maps(solution_errors, solution_coords, y_col_names, save_dir, model_name,
                     n_solutions=3, error_range=10):
-    """Create spatial error maps for each output on selected test solutions."""
+    """Create all visualizations for a model."""
     os.makedirs(save_dir, exist_ok=True)
 
-    # Pick first n solutions
     lids = sorted(solution_errors.keys())[:n_solutions]
     active_names = [n for n in y_col_names if n in solution_errors[lids[0]]]
 
-    output_labels = {
-        'qw': 'Heat Flux qw (W/m\u00b2)',
-        'pw': 'Pressure pw (Pa)',
-        'tw': 'Shear Stress \u03c4w (Pa)',
-        'me': 'Edge Mach Me',
-        'theta': 'Momentum Thickness \u03b8 (m)',
-    }
-
-    # --- Per-output: show n_solutions side by side ---
+    # ========================================
+    # 1. ERROR MAPS (dark background, red-white-green)
+    # ========================================
     for name in active_names:
         fig, axes = plt.subplots(2, n_solutions, figsize=(6 * n_solutions, 10))
+        fig.patch.set_facecolor(DARK_BG)
         if n_solutions == 1:
             axes = axes.reshape(-1, 1)
-        fig.suptitle(f'{model_name} — {output_labels.get(name, name)} Error Map',
-                     fontsize=16, fontweight='bold', y=0.98)
+        fig.suptitle(f'{model_name} \u2014 {OUTPUT_LABELS.get(name, name)} Signed Error',
+                     fontsize=16, fontweight='bold', color='white', y=0.98)
 
         for j, lid in enumerate(lids):
             errs = solution_errors[lid][name]
@@ -183,41 +201,52 @@ def plot_error_maps(solution_errors, solution_coords, y_col_names, save_dir, mod
             z_coord = coords['Z'][mask]
             r_perp = np.sqrt(y_coord**2 + z_coord**2)
 
-            # Side view: X vs r_perp
+            # Side view
             ax = axes[0, j]
+            style_ax_dark(ax)
             sc = ax.scatter(x_coord, r_perp, c=signed, cmap=cmap_rwg,
                            vmin=-error_range, vmax=error_range,
-                           s=0.3, alpha=0.8, edgecolors='none')
-            ax.set_xlabel('X (m)', fontsize=10)
-            ax.set_ylabel('r (m)', fontsize=10)
-            ax.set_title(f'Solution {lid} — Side View', fontsize=11)
+                           s=0.3, alpha=0.9, edgecolors='none')
+            ax.set_xlabel('X (m)')
+            ax.set_ylabel('r (m)')
+            ax.set_title(f'Solution {lid} \u2014 Side View')
             ax.set_aspect('equal')
-            plt.colorbar(sc, ax=ax, label='Signed Error (%)', shrink=0.8)
+            cb = plt.colorbar(sc, ax=ax, shrink=0.8)
+            cb.set_label('Signed Error (%)', color='white')
+            cb.ax.yaxis.set_tick_params(color='white')
+            plt.setp(plt.getp(cb.ax.axes, 'yticklabels'), color='white')
 
-            # Front view: Y vs Z
+            # Front view
             ax = axes[1, j]
+            style_ax_dark(ax)
             sc = ax.scatter(y_coord, z_coord, c=signed, cmap=cmap_rwg,
                            vmin=-error_range, vmax=error_range,
-                           s=0.3, alpha=0.8, edgecolors='none')
-            ax.set_xlabel('Y (m)', fontsize=10)
-            ax.set_ylabel('Z (m)', fontsize=10)
-            ax.set_title(f'Solution {lid} — Front View', fontsize=11)
+                           s=0.3, alpha=0.9, edgecolors='none')
+            ax.set_xlabel('Y (m)')
+            ax.set_ylabel('Z (m)')
+            ax.set_title(f'Solution {lid} \u2014 Front View')
             ax.set_aspect('equal')
-            plt.colorbar(sc, ax=ax, label='Signed Error (%)', shrink=0.8)
+            cb = plt.colorbar(sc, ax=ax, shrink=0.8)
+            cb.set_label('Signed Error (%)', color='white')
+            cb.ax.yaxis.set_tick_params(color='white')
+            plt.setp(plt.getp(cb.ax.axes, 'yticklabels'), color='white')
 
         plt.tight_layout()
         out_path = os.path.join(save_dir, f'error_map_{name}.png')
-        plt.savefig(out_path, dpi=200, bbox_inches='tight')
+        plt.savefig(out_path, dpi=200, bbox_inches='tight', facecolor=DARK_BG)
         plt.close()
         print(f"    Saved {out_path}")
 
-    # --- Combined overview: all outputs for solution 0, side view ---
+    # ========================================
+    # 2. ERROR OVERVIEW (dark bg, all outputs, 1 solution)
+    # ========================================
     lid = lids[0]
     fig, axes = plt.subplots(1, len(active_names), figsize=(5 * len(active_names), 4))
+    fig.patch.set_facecolor(DARK_BG)
     if len(active_names) == 1:
         axes = [axes]
-    fig.suptitle(f'{model_name} — Solution {lid} — All Outputs (Side View)',
-                 fontsize=14, fontweight='bold', y=1.02)
+    fig.suptitle(f'{model_name} \u2014 Solution {lid} \u2014 Error Overview (Side View)',
+                 fontsize=14, fontweight='bold', color='white', y=1.02)
 
     for i, name in enumerate(active_names):
         errs = solution_errors[lid][name]
@@ -230,28 +259,155 @@ def plot_error_maps(solution_errors, solution_coords, y_col_names, save_dir, mod
         r_perp = np.sqrt(y_coord**2 + z_coord**2)
 
         ax = axes[i]
+        style_ax_dark(ax)
         sc = ax.scatter(x_coord, r_perp, c=signed, cmap=cmap_rwg,
                        vmin=-error_range, vmax=error_range,
-                       s=0.5, alpha=0.8, edgecolors='none')
-        ax.set_xlabel('X (m)', fontsize=9)
-        ax.set_ylabel('r (m)', fontsize=9)
-        ax.set_title(output_labels.get(name, name), fontsize=10)
+                       s=0.5, alpha=0.9, edgecolors='none')
+        ax.set_xlabel('X (m)')
+        ax.set_ylabel('r (m)')
+        ax.set_title(OUTPUT_LABELS.get(name, name))
         ax.set_aspect('equal')
-        plt.colorbar(sc, ax=ax, label='Error (%)', shrink=0.8)
+        cb = plt.colorbar(sc, ax=ax, shrink=0.8)
+        cb.set_label('Error (%)', color='white')
+        cb.ax.yaxis.set_tick_params(color='white')
+        plt.setp(plt.getp(cb.ax.axes, 'yticklabels'), color='white')
 
     plt.tight_layout()
     out_path = os.path.join(save_dir, 'error_map_overview.png')
-    plt.savefig(out_path, dpi=200, bbox_inches='tight')
+    plt.savefig(out_path, dpi=200, bbox_inches='tight', facecolor=DARK_BG)
     plt.close()
     print(f"    Saved {out_path}")
 
-    # --- Error distribution histograms ---
+    # ========================================
+    # 3. GROUND TRUTH vs PREDICTION (light bg, blue-red, side by side)
+    # ========================================
+    lid = lids[0]
+    for name in active_names:
+        errs = solution_errors[lid][name]
+        coords = solution_coords[lid]
+        mask = errs['mask']
+        true_vals = errs['true'][mask]
+        pred_vals = errs['pred'][mask]
+        x_coord = coords['X'][mask]
+        y_coord = coords['Y'][mask]
+        z_coord = coords['Z'][mask]
+        r_perp = np.sqrt(y_coord**2 + z_coord**2)
+
+        # Use log10 for display (values span orders of magnitude)
+        true_log = np.log10(np.clip(true_vals, 1e-10, None))
+        pred_log = np.log10(np.clip(pred_vals, 1e-10, None))
+        vmin = min(true_log.min(), pred_log.min())
+        vmax = max(true_log.max(), pred_log.max())
+
+        fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+        fig.patch.set_facecolor('white')
+        fig.suptitle(f'{model_name} \u2014 {OUTPUT_LABELS.get(name, name)} \u2014 Solution {lid}',
+                     fontsize=16, fontweight='bold', color='#222222', y=0.98)
+
+        # Top row: side views
+        for col, (vals, label) in enumerate([(true_log, 'Ground Truth (CFD)'),
+                                              (pred_log, 'Model Prediction')]):
+            ax = axes[0, col]
+            style_ax_light(ax)
+            sc = ax.scatter(x_coord, r_perp, c=vals, cmap='jet',
+                           vmin=vmin, vmax=vmax,
+                           s=0.3, alpha=0.9, edgecolors='none')
+            ax.set_xlabel('X (m)')
+            ax.set_ylabel('r (m)')
+            ax.set_title(f'{label} \u2014 Side View')
+            ax.set_aspect('equal')
+            cb = plt.colorbar(sc, ax=ax, shrink=0.8)
+            cb.set_label(f'log10({name})')
+
+        # Bottom row: front views
+        for col, (vals, label) in enumerate([(true_log, 'Ground Truth (CFD)'),
+                                              (pred_log, 'Model Prediction')]):
+            ax = axes[1, col]
+            style_ax_light(ax)
+            sc = ax.scatter(y_coord, z_coord, c=vals, cmap='jet',
+                           vmin=vmin, vmax=vmax,
+                           s=0.3, alpha=0.9, edgecolors='none')
+            ax.set_xlabel('Y (m)')
+            ax.set_ylabel('Z (m)')
+            ax.set_title(f'{label} \u2014 Front View')
+            ax.set_aspect('equal')
+            cb = plt.colorbar(sc, ax=ax, shrink=0.8)
+            cb.set_label(f'log10({name})')
+
+        plt.tight_layout()
+        out_path = os.path.join(save_dir, f'truth_vs_pred_{name}.png')
+        plt.savefig(out_path, dpi=200, bbox_inches='tight', facecolor='white')
+        plt.close()
+        print(f"    Saved {out_path}")
+
+    # ========================================
+    # 4. GROUND TRUTH vs PREDICTION OVERVIEW (all outputs, side view only)
+    # ========================================
+    lid = lids[0]
+    n_out = len(active_names)
+    fig, axes = plt.subplots(2, n_out, figsize=(5 * n_out, 8))
+    fig.patch.set_facecolor('white')
+    if n_out == 1:
+        axes = axes.reshape(-1, 1)
+    fig.suptitle(f'{model_name} \u2014 Solution {lid} \u2014 Ground Truth vs Prediction',
+                 fontsize=15, fontweight='bold', color='#222222', y=1.0)
+
+    for i, name in enumerate(active_names):
+        errs = solution_errors[lid][name]
+        coords = solution_coords[lid]
+        mask = errs['mask']
+        true_vals = errs['true'][mask]
+        pred_vals = errs['pred'][mask]
+        x_coord = coords['X'][mask]
+        y_coord = coords['Y'][mask]
+        z_coord = coords['Z'][mask]
+        r_perp = np.sqrt(y_coord**2 + z_coord**2)
+
+        true_log = np.log10(np.clip(true_vals, 1e-10, None))
+        pred_log = np.log10(np.clip(pred_vals, 1e-10, None))
+        vmin = min(true_log.min(), pred_log.min())
+        vmax = max(true_log.max(), pred_log.max())
+
+        # Row 0: Ground truth
+        ax = axes[0, i]
+        style_ax_light(ax)
+        sc = ax.scatter(x_coord, r_perp, c=true_log, cmap='jet',
+                       vmin=vmin, vmax=vmax, s=0.4, alpha=0.9, edgecolors='none')
+        ax.set_xlabel('X (m)')
+        ax.set_ylabel('r (m)')
+        ax.set_title(f'{OUTPUT_LABELS.get(name, name)}\nGround Truth', fontsize=10)
+        ax.set_aspect('equal')
+        cb = plt.colorbar(sc, ax=ax, shrink=0.7)
+        cb.set_label(f'log10({name})', fontsize=8)
+
+        # Row 1: Prediction
+        ax = axes[1, i]
+        style_ax_light(ax)
+        sc = ax.scatter(x_coord, r_perp, c=pred_log, cmap='jet',
+                       vmin=vmin, vmax=vmax, s=0.4, alpha=0.9, edgecolors='none')
+        ax.set_xlabel('X (m)')
+        ax.set_ylabel('r (m)')
+        ax.set_title(f'{OUTPUT_LABELS.get(name, name)}\nPrediction', fontsize=10)
+        ax.set_aspect('equal')
+        cb = plt.colorbar(sc, ax=ax, shrink=0.7)
+        cb.set_label(f'log10({name})', fontsize=8)
+
+    plt.tight_layout()
+    out_path = os.path.join(save_dir, 'truth_vs_pred_overview.png')
+    plt.savefig(out_path, dpi=200, bbox_inches='tight', facecolor='white')
+    plt.close()
+    print(f"    Saved {out_path}")
+
+    # ========================================
+    # 5. ERROR DISTRIBUTION (dark bg)
+    # ========================================
     lid = lids[0]
     fig, axes = plt.subplots(1, len(active_names), figsize=(4.5 * len(active_names), 3.5))
+    fig.patch.set_facecolor(DARK_BG)
     if len(active_names) == 1:
         axes = [axes]
-    fig.suptitle(f'{model_name} — Signed Error Distribution (Solution {lid})',
-                 fontsize=14, fontweight='bold', y=1.02)
+    fig.suptitle(f'{model_name} \u2014 Signed Error Distribution (Solution {lid})',
+                 fontsize=14, fontweight='bold', color='white', y=1.02)
 
     for i, name in enumerate(active_names):
         errs = solution_errors[lid][name]
@@ -259,19 +415,22 @@ def plot_error_maps(solution_errors, solution_coords, y_col_names, save_dir, mod
         signed = errs['signed_error'][mask]
 
         ax = axes[i]
-        ax.hist(signed, bins=100, range=(-15, 15), color='steelblue',
-                alpha=0.7, edgecolor='white', linewidth=0.3)
-        ax.axvline(0, color='red', linestyle='--', linewidth=1)
-        ax.axvline(np.median(signed), color='orange', linestyle='-', linewidth=1.5,
+        style_ax_dark(ax)
+        ax.hist(signed, bins=100, range=(-15, 15), color='#1E88E5',
+                alpha=0.8, edgecolor='#0D47A1', linewidth=0.3)
+        ax.axvline(0, color='#FF5252', linestyle='--', linewidth=1.2, label='Zero')
+        ax.axvline(np.median(signed), color='#FFB74D', linestyle='-', linewidth=1.5,
                    label=f'Median: {np.median(signed):.2f}%')
-        ax.set_xlabel('Signed Error (%)', fontsize=9)
-        ax.set_ylabel('Count', fontsize=9)
-        ax.set_title(output_labels.get(name, name), fontsize=10)
-        ax.legend(fontsize=8)
+        pct5 = (np.abs(signed) <= 5).mean() * 100
+        ax.set_xlabel('Signed Error (%)')
+        ax.set_ylabel('Count')
+        ax.set_title(f'{OUTPUT_LABELS.get(name, name)}\n(\u00b15%: {pct5:.1f}%)')
+        leg = ax.legend(fontsize=8, facecolor=DARK_AXES, edgecolor='#444444',
+                       labelcolor='white')
 
     plt.tight_layout()
     out_path = os.path.join(save_dir, 'error_distribution.png')
-    plt.savefig(out_path, dpi=200, bbox_inches='tight')
+    plt.savefig(out_path, dpi=200, bbox_inches='tight', facecolor=DARK_BG)
     plt.close()
     print(f"    Saved {out_path}")
 
@@ -280,20 +439,18 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Device: {device}")
 
-    # Cache loaded data by config key to avoid reloading CSV
     data_cache = {}
 
     for folder, cfg_overrides, flags in MODEL_CONFIGS:
         ckpt_path = os.path.join(RESULTS_DIR, folder, 'best_model.pt')
         if not os.path.exists(ckpt_path):
-            print(f"Skipping {folder} — no checkpoint found")
+            print(f"Skipping {folder} \u2014 no checkpoint found")
             continue
 
         print(f"\n{'='*60}")
         print(f"  Processing: {folder}")
         print(f"{'='*60}")
 
-        # Build config
         cfg = Config()
         for k, v in cfg_overrides.items():
             setattr(cfg, k, v)
@@ -303,7 +460,6 @@ def main():
             cfg.predict_me = False
             cfg.predict_theta = False
 
-        # Cache key
         cache_key = (cfg.train_frac, cfg.val_frac, cfg.split_seed,
                      cfg.predict_qw, cfg.predict_pw, cfg.predict_tw,
                      cfg.predict_me, cfg.predict_theta)
@@ -312,34 +468,28 @@ def main():
             data_cache[cache_key] = load_data_and_coords(cfg)
         X_test_s, Y_test_raw, meta_test, scaler_y, solution_coords, y_col_names = data_cache[cache_key]
 
-        # Load model
         print(f"  Loading model from {ckpt_path}...")
         model = MambaAutoencoder(cfg).to(device)
-        # Fix expanded A_log parameters (shared memory view from .expand())
-        for name, param in model.named_parameters():
-            if 'A_log' in name:
+        for pname, param in model.named_parameters():
+            if 'A_log' in pname:
                 param.data = param.data.clone()
         ckpt = torch.load(ckpt_path, weights_only=True, map_location=device)
         cleaned = {k.replace('_orig_mod.', ''): v for k, v in ckpt.items()}
         model.load_state_dict(cleaned, strict=False)
 
-        # Run inference
         print(f"  Running inference on {X_test_s.shape[0]} test partitions...")
         all_preds = run_model(model, X_test_s, device)
 
-        # Reconstruct solutions with overlap averaging
         print(f"  Reconstructing solutions and computing errors...")
         solution_errors = reconstruct_solutions(
             all_preds, Y_test_raw, meta_test, scaler_y, y_col_names
         )
 
-        # Plot
         save_dir = os.path.join(RESULTS_DIR, folder, 'error_maps')
         print(f"  Generating error maps...")
         plot_error_maps(solution_errors, solution_coords, y_col_names,
                        save_dir, folder, n_solutions=3, error_range=10)
 
-        # Free memory
         del model, all_preds, solution_errors
         if device.type == 'cuda':
             torch.cuda.empty_cache()
