@@ -59,6 +59,21 @@ The model trained on 50% of the data matches the accuracy of the previous pointw
 - **Training pipeline contributes more than architecture**: MLP baseline (96.8%) beats the previous simple autoencoder (94.5%) using the same pointwise approach — the improvement comes from overlapping partitions, Huber loss, gradient accumulation, and the full training pipeline
 - **Graceful degradation**: Reducing training data from 148 to 74 solutions costs only 6.4% qw accuracy
 
+## Interactive Demo
+
+A Streamlit web app provides interactive 3D visualization of predictions:
+
+```bash
+pip install streamlit plotly
+streamlit run app.py
+```
+
+- Sliders for velocity, density, and angle of attack
+- Switchable 3D interactive and 2D side views
+- Hover over any mesh point to see exact values
+- Switch between all 5 output quantities instantly (cached predictions)
+- ~3s inference on GPU, ~60-120s on CPU
+
 ## Inference
 
 The packaged model predicts all 5 surface quantities for any flight condition in ~3.3 seconds on a single GPU. Inference test suite passes **71/71** checks covering loading, physical plausibility, monotonicity, determinism, spatial patterns, and performance.
