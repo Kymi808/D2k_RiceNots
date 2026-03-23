@@ -132,7 +132,6 @@ Key design choices:
 - **Early stopping**: patience=25 on validation loss
 - **Hardware**: 4× NVIDIA L40S (48GB each) on Rice NOTS cluster via DDP
 - **Training time**: 20-40 hours depending on configuration
-- **GPU memory**: ~12.6 GB / 46 GB per GPU (27% utilization)
 
 ## Experiments
 
