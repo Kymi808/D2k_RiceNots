@@ -14,19 +14,22 @@ Fully converged model (seed 456, 300 epochs, 40h training) evaluated on 19 held-
 | Edge Mach Me (-) | 87.6% | 99.5% | **99.9%** | 100.0% | 0.35% | 1.5% |
 | Momentum Thickness θ (m) | 54.6% | 93.0% | **98.0%** | 99.5% | 0.89% | 3.4% |
 
-### Ablation Studies (80/10/10 split, seed 123, 24h training)
+### Physics Ablation Matrix (qw ±5%)
 
-| Model | qw ±5% | pw ±5% | tw ±5% | Me ±5% | θ ±5% |
-|-------|--------|--------|--------|--------|-------|
-| Full (physics) | 98.0% | 93.8% | 98.0% | 99.6% | 94.8% |
-| No Physics | 98.5% | 95.3% | 98.8% | 99.8% | 95.1% |
-| QW Only | 98.9% | — | — | — | — |
+| Split | No Physics | Normal Physics | Strong Physics (5x) | MLP Baseline |
+|-------|-----------|---------------|---------------------|-------------|
+| 80/10/10 | **98.5%** | 98.0% | 98.4% | 96.8% |
+| 60/20/20 | **96.8%** | 96.3% | 95.8% | — |
+| 40/30/30 | **92.9%** | 92.1% | 92.2% | — |
+
+No-physics model outperforms at every data split. Physics constraints add optimization overhead without providing new information when sufficient training data is available. Strong physics (5x lambda) slightly improves over normal physics at 80% data but degrades at lower splits.
 
 ### Comparison to Previous Approaches
 
 | Model | qw ±5% | Architecture |
 |-------|--------|-------------|
 | **This work (best)** | **99.5%** | Mamba-3 SSM, full mesh, overlapping partitions |
+| MLP Baseline (same pipeline) | 96.8% | Pointwise MLP, same training pipeline |
 | Simple Autoencoder | 94.5% | Pointwise dense layers |
 | Mamba (downsampled) | 94.4% | Mamba-3 SSM, 4K subsample |
 | Two-Stage NN (no leakage) | 79.6% | Physics-aware two-stage MLP |
@@ -48,6 +51,13 @@ How many CFD simulations does NASA need? Accuracy degrades gracefully as trainin
 The model trained on 50% of the data matches the accuracy of the previous pointwise baseline trained on 80%. Even at 40% (74 solutions), all metrics remain above 90%.
 
 ![Data Efficiency Summary](partition_graph/data_efficiency_summary.png)
+
+### Key Findings
+
+- **Architecture matters**: Mamba SSM (99.5%) outperforms MLP baseline (96.8%) by 2.7% — spatial context from sequential modeling captures patterns that pointwise models miss
+- **Physics losses are redundant with sufficient data**: No-physics consistently outperforms physics-informed models at every data split tested (80% through 40%)
+- **Training pipeline contributes more than architecture**: MLP baseline (96.8%) beats the previous simple autoencoder (94.5%) using the same pointwise approach — the improvement comes from overlapping partitions, Huber loss, gradient accumulation, and the full training pipeline
+- **Graceful degradation**: Reducing training data from 148 to 74 solutions costs only 6.4% qw accuracy
 
 ## Inference
 
@@ -122,6 +132,7 @@ Key design choices:
 - **Early stopping**: patience=25 on validation loss
 - **Hardware**: 4× NVIDIA L40S (48GB each) on Rice NOTS cluster via DDP
 - **Training time**: 20-40 hours depending on configuration
+- **GPU memory**: ~12.6 GB / 46 GB per GPU (27% utilization)
 
 ## Experiments
 
@@ -130,11 +141,18 @@ Key design choices:
 | `slurm_train.sh` | Full model — 5 outputs, physics losses, Mamba-3 |
 | `slurm_no_physics.sh` | Ablation — same model, no physics loss terms |
 | `slurm_qw_only.sh` | Ablation — single output (heat flux only) |
+| `slurm_mlp.sh` | MLP baseline — pointwise blocks, no sequential modeling |
 | `slurm_70_15.sh` | Data efficiency — 70/15/15 train/val/test split |
 | `slurm_60_20.sh` | Data efficiency — 60/20/20 train/val/test split |
 | `slurm_50_25.sh` | Data efficiency — 50/25/25 train/val/test split |
 | `slurm_40_30.sh` | Data efficiency — 40/30/30 train/val/test split |
+| `slurm_no_physics_60.sh` | No physics at 60/20/20 |
+| `slurm_no_physics_40.sh` | No physics at 40/30/30 |
+| `slurm_strong_physics_80.sh` | Strong physics (5x lambdas) at 80/10/10 |
+| `slurm_strong_physics_60.sh` | Strong physics (5x lambdas) at 60/20/20 |
+| `slurm_strong_physics_40.sh` | Strong physics (5x lambdas) at 40/30/30 |
 | `slurm_seed2_full.sh` | Cross-validation fold 2 — full model, seed 456 |
+| `slurm_strong_physics_80_seed2.sh` | Strong physics fold 2 — seed 456, long partition |
 | `slurm_error_maps.sh` | Generate spatial error heatmaps for all models |
 | `slurm_package_and_test.sh` | Package best model and run inference tests |
 
@@ -152,22 +170,22 @@ Key design choices:
 ├── package_model.py           # Package model for production deployment
 ├── inference.py               # Production inference wrapper (MambaSurrogate class)
 ├── TECHNICAL_REFERENCE.md     # Comprehensive technical documentation
+├── INFERENCE_GUIDE.md         # Inference API and deployment guide
 ├── slurm_*.sh                 # SLURM job scripts for NOTS cluster
 ├── data/                      # Apollo CFD database (CSV)
 ├── packaged_model/            # Production-ready model (weights, scalers, mesh, config)
-│   ├── model_weights.pt       # 244K trained parameters
-│   ├── scaler_X.pkl           # Input feature scaler
-│   ├── scaler_y.pkl           # Target scaler (log10 + standardized)
-│   ├── mesh_xyz_sorted.npy    # Pre-sorted capsule mesh (49,698 points)
-│   └── config.json            # Model configuration
 ├── test_inference/            # Inference test suite (71/71 passing)
-│   ├── run_tests.py           # Test script
-│   └── results/               # Visualizations and test_summary.json
 ├── organized_results/         # Training logs, checkpoints, error maps, evaluation plots
 │   ├── full_model/            # 80/10/10, physics, seed 123
 │   ├── no_physics/            # 80/10/10, no physics, seed 123
 │   ├── qw_only/               # 80/10/10, qw only, seed 123
 │   ├── full_model_long/       # 80/10/10, physics, seed 456 (fully converged, best)
+│   ├── mlp_baseline/          # 80/10/10, MLP blocks (no sequential modeling)
+│   ├── no_physics_60/         # 60/20/20, no physics
+│   ├── no_physics_40/         # 40/30/30, no physics
+│   ├── strong_physics_80/     # 80/10/10, strong physics (5x lambdas)
+│   ├── strong_physics_60/     # 60/20/20, strong physics (5x lambdas)
+│   ├── strong_physics_40/     # 40/30/30, strong physics (5x lambdas)
 │   ├── full_70_15/            # 70/15/15 split
 │   ├── full_60_20/            # 60/20/20 split
 │   ├── full_50_25/            # 50/25/25 split
@@ -179,5 +197,6 @@ Key design choices:
 
 - **Separated flow excluded**: ~2% of surface points (theta < 0) in wake/recirculation region
 - **Interpolation only**: Trained on Mach 10-35, AoA 152-158° — no extrapolation guarantees
-- **Fixed geometry**: Apollo capsule only — different vehicles require retraining
+- **Fixed geometry**: Apollo capsule only — different vehicles require retraining (architecture is geometry-agnostic but untested on other shapes)
 - **No uncertainty quantification**: Point predictions without confidence intervals
+- **Cross-validation**: 2-fold (seeds 123 and 456) — sufficient for semester scope, additional folds planned
