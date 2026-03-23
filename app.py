@@ -217,7 +217,7 @@ def main():
     if st.sidebar.button("Predict", type="primary", use_container_width=True) or (
         needs_rerun and 'results' not in st.session_state
     ):
-        with st.spinner(f"Running inference ({surrogate.device})... ~3s GPU / ~60s CPU"):
+        with st.spinner(f"Running inference ({surrogate.device})... ~3s on GPU, ~60-120s on CPU"):
             t0 = time.time()
             results = surrogate.predict(
                 velocity=velocity,
