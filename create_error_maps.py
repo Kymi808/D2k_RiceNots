@@ -28,6 +28,14 @@ MODEL_CONFIGS = [
     ('full_60_20',      dict(train_frac=0.60, val_frac=0.20),      dict()),
     ('full_50_25',      dict(train_frac=0.50, val_frac=0.25),      dict()),
     ('full_40_30',      dict(train_frac=0.40, val_frac=0.30),      dict()),
+    ('mlp_baseline',    dict(),                                    dict(block_type='mlp')),
+    ('no_physics_60',   dict(train_frac=0.60, val_frac=0.20),      dict()),
+    ('no_physics_40',   dict(train_frac=0.40, val_frac=0.30),      dict()),
+    ('strong_physics_80', dict(),                                  dict()),
+    ('strong_physics_60', dict(train_frac=0.60, val_frac=0.20),    dict()),
+    ('strong_physics_40', dict(train_frac=0.40, val_frac=0.30),    dict()),
+    ('strong_physics_80_seed2', dict(split_seed=456),              dict()),
+    ('no_physics_long', dict(split_seed=456),                      dict()),
 ]
 
 # Custom red-white-green diverging colormap (for error maps on dark bg)
@@ -459,6 +467,8 @@ def main():
             cfg.predict_tw = False
             cfg.predict_me = False
             cfg.predict_theta = False
+        if flags.get('block_type'):
+            cfg.block_type = flags['block_type']
 
         cache_key = (cfg.train_frac, cfg.val_frac, cfg.split_seed,
                      cfg.predict_qw, cfg.predict_pw, cfg.predict_tw,
