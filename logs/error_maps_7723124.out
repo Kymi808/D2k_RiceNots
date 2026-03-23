@@ -1,0 +1,62 @@
+============================================
+Job ID: 7723124  [ERROR MAPS]
+Date:   Fri Mar 20 12:54:38 AM CDT 2026
+============================================
+Device: cuda
+
+============================================================
+  Processing: full_model
+============================================================
+  Loading data (seed=123, train=0.8)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/full_model/best_model.pt...
+  Running inference on 152 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/full_model/error_maps/error_map_qw.png
+    Saved organized_results/full_model/error_maps/error_map_pw.png
+    Saved organized_results/full_model/error_maps/error_map_tw.png
+    Saved organized_results/full_model/error_maps/error_map_me.png
+    Saved organized_results/full_model/error_maps/error_map_theta.png
+    Saved organized_results/full_model/error_maps/error_map_overview.png
+    Saved organized_results/full_model/error_maps/error_distribution.png
+
+============================================================
+  Processing: no_physics
+============================================================
+  Loading model from organized_results/no_physics/best_model.pt...
+  Running inference on 152 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/no_physics/error_maps/error_map_qw.png
+    Saved organized_results/no_physics/error_maps/error_map_pw.png
+    Saved organized_results/no_physics/error_maps/error_map_tw.png
+    Saved organized_results/no_physics/error_maps/error_map_me.png
+    Saved organized_results/no_physics/error_maps/error_map_theta.png
+    Saved organized_results/no_physics/error_maps/error_map_overview.png
+    Saved organized_results/no_physics/error_maps/error_distribution.png
+
+============================================================
+  Processing: qw_only
+============================================================
+  Loading data (seed=123, train=0.8)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/qw_only/best_model.pt...
+
+Error maps completed: Fri Mar 20 12:58:14 AM CDT 2026

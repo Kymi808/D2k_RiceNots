@@ -1,0 +1,8 @@
+============================================
+Job ID: 7715869  [EVAL]
+Checkpoint: checkpoints/run_7691002/best_model.pt
+Extra args: --train_frac 0.40 --val_frac 0.30
+Date:   Thu Mar 19 05:58:29 PM CDT 2026
+============================================
+
+Eval completed: Thu Mar 19 05:58:31 PM CDT 2026

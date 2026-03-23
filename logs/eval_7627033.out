@@ -1,0 +1,23 @@
+============================================
+Job ID: 7627033  [EVAL]
+Checkpoint: checkpoints/run_7516326/best_model.pt
+Extra args: 
+Date:   Mon Mar 16 10:55:03 AM CDT 2026
+============================================
+Loading data...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+Building partitioned datasets...
+Train partitions: (1184, 8192, 7)
+Val partitions:   (144, 8192, 7)
+Test partitions:  (152, 8192, 7)
+Partitions per solution: 8
+
+Eval completed: Mon Mar 16 10:55:33 AM CDT 2026

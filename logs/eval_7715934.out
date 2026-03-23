@@ -1,0 +1,93 @@
+============================================
+Job ID: 7715934  [EVAL]
+Checkpoint: checkpoints/run_7691002/best_model.pt
+Extra args: --train_frac 0.40 --val_frac 0.30
+Date:   Thu Mar 19 06:03:21 PM CDT 2026
+============================================
+Loading data...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    3713024
+val      2809856
+test     2759680
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+Building partitioned datasets...
+Train partitions: (592, 8192, 7)
+Val partitions:   (448, 8192, 7)
+Test partitions:  (440, 8192, 7)
+Partitions per solution: 8
+Loaded checkpoint: checkpoints/run_7691002/best_model.pt
+Model: 244,256 parameters, block_type=mamba3
+Targets: ['qw', 'pw', 'tw', 'me', 'theta']
+
+============================================================
+  EVALUATION ON TEST SET
+============================================================
+
+============================================================
+  Heat Flux qw (W/m²) — MAMBA3 RESULTS
+============================================================
+  MAE:          9,901
+  RMSE:         23,225
+  Within ±1%:   48.1%
+  Within ±3%:   82.6%
+  Within ±5%:   92.0%
+  Within ±10%:  97.3%
+  Median error:  1.06%
+  95th %%ile:    6.9%
+
+============================================================
+  Pressure pw (Pa) — MAMBA3 RESULTS
+============================================================
+  MAE:          235
+  RMSE:         556
+  Within ±1%:   37.6%
+  Within ±3%:   76.8%
+  Within ±5%:   89.8%
+  Within ±10%:  97.8%
+  Median error:  1.41%
+  95th %%ile:    7.0%
+
+============================================================
+  Shear Stress τw (Pa) — MAMBA3 RESULTS
+============================================================
+  MAE:          1
+  RMSE:         2
+  Within ±1%:   45.5%
+  Within ±3%:   85.8%
+  Within ±5%:   95.3%
+  Within ±10%:  99.3%
+  Median error:  1.13%
+  95th %%ile:    4.9%
+
+============================================================
+  Edge Mach Me (-) — MAMBA3 RESULTS
+============================================================
+  MAE:          0
+  RMSE:         0
+  Within ±1%:   68.1%
+  Within ±3%:   96.8%
+  Within ±5%:   98.8%
+  Within ±10%:  99.8%
+  Median error:  0.63%
+  95th %%ile:    2.5%
+
+============================================================
+  Momentum Thickness θ (m) — MAMBA3 RESULTS
+============================================================
+  MAE:          0
+  RMSE:         0
+  Within ±1%:   37.2%
+  Within ±3%:   77.6%
+  Within ±5%:   91.5%
+  Within ±10%:  97.9%
+  Median error:  1.44%
+  95th %%ile:    6.4%
+Saved evaluation plots to results/run_7691002/evaluation_plots.png
+
+Plots saved to results/run_7691002/
+
+Eval completed: Thu Mar 19 06:06:55 PM CDT 2026

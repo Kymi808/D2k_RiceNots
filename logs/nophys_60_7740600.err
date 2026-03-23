@@ -1,0 +1,4 @@
+[W321 20:33:49.700474864 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[W321 20:33:49.715374995 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[W321 20:33:49.770252202 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[W321 20:33:49.795255250 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())

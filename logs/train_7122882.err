@@ -1,0 +1,174 @@
+Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/__init__.py", line 898, in <module>
+    raise ImportError(
+ImportError: Failed to load PyTorch C extensions:
+    It appears that PyTorch has loaded the `torch/_C` folder
+    of the PyTorch repository rather than the C extensions which
+    are expected in the `torch._C` namespace. This can occur when
+    using the `install` workflow. e.g.
+        $ python setup.py install && python -c "import torch"
+
+    This error can generally be solved using the `develop` workflow
+        $ python setup.py develop && python -c "import torch"  # This should succeed
+    or by running Python from a different directory.
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/__init__.py", line 898, in <module>
+    raise ImportError(
+ImportError: Failed to load PyTorch C extensions:
+    It appears that PyTorch has loaded the `torch/_C` folder
+    of the PyTorch repository rather than the C extensions which
+    are expected in the `torch._C` namespace. This can occur when
+    using the `install` workflow. e.g.
+        $ python setup.py install && python -c "import torch"
+
+    This error can generally be solved using the `develop` workflow
+        $ python setup.py develop && python -c "import torch"  # This should succeed
+    or by running Python from a different directory.
+W0311 22:00:48.568000 693757 torch/distributed/run.py:793] 
+W0311 22:00:48.568000 693757 torch/distributed/run.py:793] *****************************************
+W0311 22:00:48.568000 693757 torch/distributed/run.py:793] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0311 22:00:48.568000 693757 torch/distributed/run.py:793] *****************************************
+[rank0]:[E311 23:33:48.836845738 ProcessGroupNCCL.cpp:616] [Rank 0] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=15398, OpType=ALLREDUCE, NumelIn=228896, NumelOut=228896, Timeout(ms)=600000) ran for 600004 milliseconds before timing out.
+[rank0]:[E311 23:33:48.847092797 ProcessGroupNCCL.cpp:1785] [PG ID 0 PG GUID 0(default_pg) Rank 0] Exception (either an error or timeout) detected by watchdog at work: 15398, last enqueued NCCL work: 15398, last completed NCCL work: 15397.
+[rank3]:[E311 23:33:48.855569673 ProcessGroupNCCL.cpp:616] [Rank 3] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=15398, OpType=ALLREDUCE, NumelIn=228896, NumelOut=228896, Timeout(ms)=600000) ran for 600009 milliseconds before timing out.
+[rank3]:[E311 23:33:48.855668778 ProcessGroupNCCL.cpp:1785] [PG ID 0 PG GUID 0(default_pg) Rank 3] Exception (either an error or timeout) detected by watchdog at work: 15398, last enqueued NCCL work: 15398, last completed NCCL work: 15397.
+[rank2]:[E311 23:33:48.923381215 ProcessGroupNCCL.cpp:616] [Rank 2] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=15398, OpType=ALLREDUCE, NumelIn=228896, NumelOut=228896, Timeout(ms)=600000) ran for 600093 milliseconds before timing out.
+[rank2]:[E311 23:33:48.923483195 ProcessGroupNCCL.cpp:1785] [PG ID 0 PG GUID 0(default_pg) Rank 2] Exception (either an error or timeout) detected by watchdog at work: 15398, last enqueued NCCL work: 15398, last completed NCCL work: 15397.
+[rank3]:[E311 23:33:49.537249021 ProcessGroupNCCL.cpp:1834] [PG ID 0 PG GUID 0(default_pg) Rank 3] Timeout at NCCL work: 15398, last enqueued NCCL work: 15398, last completed NCCL work: 15397.
+[rank3]:[E311 23:33:49.537263731 ProcessGroupNCCL.cpp:630] [Rank 3] Some NCCL operations have failed or timed out. Due to the asynchronous nature of CUDA kernels, subsequent GPU operations might run on corrupted/incomplete data.
+[rank3]:[E311 23:33:49.537267064 ProcessGroupNCCL.cpp:636] [Rank 3] To avoid data inconsistency, we are taking the entire process down.
+[rank0]:[E311 23:33:49.537293719 ProcessGroupNCCL.cpp:1834] [PG ID 0 PG GUID 0(default_pg) Rank 0] Timeout at NCCL work: 15398, last enqueued NCCL work: 15398, last completed NCCL work: 15397.
+[rank0]:[E311 23:33:49.537307867 ProcessGroupNCCL.cpp:630] [Rank 0] Some NCCL operations have failed or timed out. Due to the asynchronous nature of CUDA kernels, subsequent GPU operations might run on corrupted/incomplete data.
+[rank0]:[E311 23:33:49.537310882 ProcessGroupNCCL.cpp:636] [Rank 0] To avoid data inconsistency, we are taking the entire process down.
+[rank2]:[E311 23:33:49.537680319 ProcessGroupNCCL.cpp:1834] [PG ID 0 PG GUID 0(default_pg) Rank 2] Timeout at NCCL work: 15398, last enqueued NCCL work: 15398, last completed NCCL work: 15397.
+[rank2]:[E311 23:33:49.537694598 ProcessGroupNCCL.cpp:630] [Rank 2] Some NCCL operations have failed or timed out. Due to the asynchronous nature of CUDA kernels, subsequent GPU operations might run on corrupted/incomplete data.
+[rank2]:[E311 23:33:49.537697712 ProcessGroupNCCL.cpp:636] [Rank 2] To avoid data inconsistency, we are taking the entire process down.
+[rank0]:[E311 23:33:49.543549774 ProcessGroupNCCL.cpp:1595] [PG ID 0 PG GUID 0(default_pg) Rank 0] Process group watchdog thread terminated with exception: [Rank 0] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=15398, OpType=ALLREDUCE, NumelIn=228896, NumelOut=228896, Timeout(ms)=600000) ran for 600004 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f0010451446 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x7f0011798a92 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x7f001179fed3 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x7f00117a193d in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x7f005a7895c0 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x89c02 (0x7f0062489c02 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x10ec40 (0x7f006250ec40 in /lib64/libc.so.6)
+
+terminate called after throwing an instance of 'c10::DistBackendError'
+[rank2]:[E311 23:33:49.543578606 ProcessGroupNCCL.cpp:1595] [PG ID 0 PG GUID 0(default_pg) Rank 2] Process group watchdog thread terminated with exception: [Rank 2] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=15398, OpType=ALLREDUCE, NumelIn=228896, NumelOut=228896, Timeout(ms)=600000) ran for 600093 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f65e665f446 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x7f65e79a6a92 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x7f65e79aded3 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x7f65e79af93d in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x7f66309975c0 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x89c02 (0x7f6638689c02 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x10ec40 (0x7f663870ec40 in /lib64/libc.so.6)
+
+terminate called after throwing an instance of 'c10::DistBackendError'
+[rank3]:[E311 23:33:49.543625199 ProcessGroupNCCL.cpp:1595] [PG ID 0 PG GUID 0(default_pg) Rank 3] Process group watchdog thread terminated with exception: [Rank 3] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=15398, OpType=ALLREDUCE, NumelIn=228896, NumelOut=228896, Timeout(ms)=600000) ran for 600009 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f8fdfa8c446 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x7f8fe0dd3a92 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x7f8fe0ddaed3 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x7f8fe0ddc93d in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x7f9029dc45c0 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x89c02 (0x7f9031a89c02 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x10ec40 (0x7f9031b0ec40 in /lib64/libc.so.6)
+
+terminate called after throwing an instance of 'c10::DistBackendError'
+  what():  [PG ID 0 PG GUID 0(default_pg) Rank 3] Process group watchdog thread terminated with exception: [Rank 3] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=15398, OpType=ALLREDUCE, NumelIn=228896, NumelOut=228896, Timeout(ms)=600000) ran for 600009 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f8fdfa8c446 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x7f8fe0dd3a92 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x7f8fe0ddaed3 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x7f8fe0ddc93d in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x7f9029dc45c0 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x89c02 (0x7f9031a89c02 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x10ec40 (0x7f9031b0ec40 in /lib64/libc.so.6)
+
+Exception raised from ncclCommWatchdog at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1601 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f8fdfa8c446 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0xe7eb1b (0x7f8fe0a51b1b in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: <unknown function> + 0x145c0 (0x7f9029dc45c0 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #3: <unknown function> + 0x89c02 (0x7f9031a89c02 in /lib64/libc.so.6)
+frame #4: <unknown function> + 0x10ec40 (0x7f9031b0ec40 in /lib64/libc.so.6)
+
+  what():  [PG ID 0 PG GUID 0(default_pg) Rank 0] Process group watchdog thread terminated with exception: [Rank 0] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=15398, OpType=ALLREDUCE, NumelIn=228896, NumelOut=228896, Timeout(ms)=600000) ran for 600004 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f0010451446 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x7f0011798a92 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x7f001179fed3 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x7f00117a193d in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x7f005a7895c0 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x89c02 (0x7f0062489c02 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x10ec40 (0x7f006250ec40 in /lib64/libc.so.6)
+
+Exception raised from ncclCommWatchdog at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1601 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f0010451446 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0xe7eb1b (0x7f0011416b1b in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: <unknown function> + 0x145c0 (0x7f005a7895c0 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #3: <unknown function> + 0x89c02 (0x7f0062489c02 in /lib64/libc.so.6)
+frame #4: <unknown function> + 0x10ec40 (0x7f006250ec40 in /lib64/libc.so.6)
+
+  what():  [PG ID 0 PG GUID 0(default_pg) Rank 2] Process group watchdog thread terminated with exception: [Rank 2] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=15398, OpType=ALLREDUCE, NumelIn=228896, NumelOut=228896, Timeout(ms)=600000) ran for 600093 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f65e665f446 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x7f65e79a6a92 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x7f65e79aded3 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x7f65e79af93d in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x7f66309975c0 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x89c02 (0x7f6638689c02 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x10ec40 (0x7f663870ec40 in /lib64/libc.so.6)
+
+Exception raised from ncclCommWatchdog at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1601 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x7f65e665f446 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0xe7eb1b (0x7f65e7624b1b in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: <unknown function> + 0x145c0 (0x7f66309975c0 in /projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/lib/libtorch.so)
+frame #3: <unknown function> + 0x89c02 (0x7f6638689c02 in /lib64/libc.so.6)
+frame #4: <unknown function> + 0x10ec40 (0x7f663870ec40 in /lib64/libc.so.6)
+
+E0311 23:33:49.660000 693757 torch/distributed/elastic/multiprocessing/api.py:869] failed (exitcode: -6) local_rank: 0 (pid: 693829) of binary: /opt/apps/software/Miniforge3/24.1.2-0/bin/python
+Traceback (most recent call last):
+  File "/home/kzz1/.local/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 355, in wrapper
+    return f(*args, **kwargs)
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/run.py", line 919, in main
+    run(args)
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/run.py", line 910, in run
+    elastic_launch(
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/launcher/api.py", line 138, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/launcher/api.py", line 269, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+=======================================================
+train.py FAILED
+-------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-03-11_23:33:49
+  host      : bb7u15g1.nots.rice.edu
+  rank      : 2 (local_rank: 2)
+  exitcode  : -6 (pid: 693831)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 693831
+[2]:
+  time      : 2026-03-11_23:33:49
+  host      : bb7u15g1.nots.rice.edu
+  rank      : 3 (local_rank: 3)
+  exitcode  : -6 (pid: 693832)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 693832
+-------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-03-11_23:33:49
+  host      : bb7u15g1.nots.rice.edu
+  rank      : 0 (local_rank: 0)
+  exitcode  : -6 (pid: 693829)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 693829
+=======================================================

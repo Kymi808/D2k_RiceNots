@@ -1,0 +1,5 @@
+[W321 20:43:34.532318198 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[W321 20:43:34.548687867 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[W321 20:43:34.553694619 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[W321 20:43:34.587012209 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+slurmstepd: error: *** JOB 7740602 ON bb7u13g1 CANCELLED AT 2026-03-22T20:43:43 DUE TO TIME LIMIT ***

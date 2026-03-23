@@ -1,0 +1,197 @@
+============================================
+Job ID: 7723526  [ERROR MAPS]
+Date:   Fri Mar 20 01:16:23 AM CDT 2026
+============================================
+Device: cuda
+
+============================================================
+  Processing: full_model
+============================================================
+  Loading data (seed=123, train=0.8)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/full_model/best_model.pt...
+  Running inference on 152 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/full_model/error_maps/error_map_qw.png
+    Saved organized_results/full_model/error_maps/error_map_pw.png
+    Saved organized_results/full_model/error_maps/error_map_tw.png
+    Saved organized_results/full_model/error_maps/error_map_me.png
+    Saved organized_results/full_model/error_maps/error_map_theta.png
+    Saved organized_results/full_model/error_maps/error_map_overview.png
+    Saved organized_results/full_model/error_maps/error_distribution.png
+
+============================================================
+  Processing: no_physics
+============================================================
+  Loading model from organized_results/no_physics/best_model.pt...
+  Running inference on 152 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/no_physics/error_maps/error_map_qw.png
+    Saved organized_results/no_physics/error_maps/error_map_pw.png
+    Saved organized_results/no_physics/error_maps/error_map_tw.png
+    Saved organized_results/no_physics/error_maps/error_map_me.png
+    Saved organized_results/no_physics/error_maps/error_map_theta.png
+    Saved organized_results/no_physics/error_maps/error_map_overview.png
+    Saved organized_results/no_physics/error_maps/error_distribution.png
+
+============================================================
+  Processing: qw_only
+============================================================
+  Loading data (seed=123, train=0.8)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/qw_only/best_model.pt...
+  Running inference on 152 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/qw_only/error_maps/error_map_qw.png
+    Saved organized_results/qw_only/error_maps/error_map_overview.png
+    Saved organized_results/qw_only/error_maps/error_distribution.png
+
+============================================================
+  Processing: full_model_long
+============================================================
+  Loading data (seed=456, train=0.8)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/full_model_long/best_model.pt...
+  Running inference on 152 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/full_model_long/error_maps/error_map_qw.png
+    Saved organized_results/full_model_long/error_maps/error_map_pw.png
+    Saved organized_results/full_model_long/error_maps/error_map_tw.png
+    Saved organized_results/full_model_long/error_maps/error_map_me.png
+    Saved organized_results/full_model_long/error_maps/error_map_theta.png
+    Saved organized_results/full_model_long/error_maps/error_map_overview.png
+    Saved organized_results/full_model_long/error_maps/error_distribution.png
+
+============================================================
+  Processing: full_70_15
+============================================================
+  Loading data (seed=123, train=0.7)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    6522880
+val      1404928
+test     1354752
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/full_70_15/best_model.pt...
+  Running inference on 216 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/full_70_15/error_maps/error_map_qw.png
+    Saved organized_results/full_70_15/error_maps/error_map_pw.png
+    Saved organized_results/full_70_15/error_maps/error_map_tw.png
+    Saved organized_results/full_70_15/error_maps/error_map_me.png
+    Saved organized_results/full_70_15/error_maps/error_map_theta.png
+    Saved organized_results/full_70_15/error_maps/error_map_overview.png
+    Saved organized_results/full_70_15/error_maps/error_distribution.png
+
+============================================================
+  Processing: full_60_20
+============================================================
+  Loading data (seed=123, train=0.6)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    5569536
+val      1856512
+test     1856512
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/full_60_20/best_model.pt...
+  Running inference on 296 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/full_60_20/error_maps/error_map_qw.png
+    Saved organized_results/full_60_20/error_maps/error_map_pw.png
+    Saved organized_results/full_60_20/error_maps/error_map_tw.png
+    Saved organized_results/full_60_20/error_maps/error_map_me.png
+    Saved organized_results/full_60_20/error_maps/error_map_theta.png
+    Saved organized_results/full_60_20/error_maps/error_map_overview.png
+    Saved organized_results/full_60_20/error_maps/error_distribution.png
+
+============================================================
+  Processing: full_50_25
+============================================================
+  Loading data (seed=123, train=0.5)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    4616192
+test     2358272
+val      2308096
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/full_50_25/best_model.pt...
+  Running inference on 376 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/full_50_25/error_maps/error_map_qw.png
+    Saved organized_results/full_50_25/error_maps/error_map_pw.png
+    Saved organized_results/full_50_25/error_maps/error_map_tw.png
+    Saved organized_results/full_50_25/error_maps/error_map_me.png
+    Saved organized_results/full_50_25/error_maps/error_map_theta.png
+    Saved organized_results/full_50_25/error_maps/error_map_overview.png
+    Saved organized_results/full_50_25/error_maps/error_distribution.png
+
+============================================================
+  Processing: full_40_30
+============================================================
+  Loading data (seed=123, train=0.4)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    3713024
+val      2809856
+test     2759680
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/full_40_30/best_model.pt...
+  Running inference on 440 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/full_40_30/error_maps/error_map_qw.png
+    Saved organized_results/full_40_30/error_maps/error_map_pw.png
+    Saved organized_results/full_40_30/error_maps/error_map_tw.png
+    Saved organized_results/full_40_30/error_maps/error_map_me.png
+    Saved organized_results/full_40_30/error_maps/error_map_theta.png
+    Saved organized_results/full_40_30/error_maps/error_map_overview.png
+    Saved organized_results/full_40_30/error_maps/error_distribution.png
+
+============================================================
+  All error maps generated!
+============================================================
+
+Error maps completed: Fri Mar 20 01:34:50 AM CDT 2026

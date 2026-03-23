@@ -1,0 +1,70 @@
+============================================
+Job ID: 7135269
+Node:   bb6u19g1
+GPUs:   0,1,2,3
+Date:   Thu Mar 12 06:00:47 AM CDT 2026
+============================================
+
+Starting training with  GPUs...
+
+============================================================
+  Mamba Autoencoder CFD — DDP
+============================================================
+  Device: cuda:0
+  GPU: NVIDIA L40S
+  VRAM: 47.6 GB
+  World size: 4
+  Block type: mamba3
+  seq_len: 8192, partitions: 8
+  d_model: 64, d_state: 64, n_layers: 4
+  Targets: ['qw', 'pw', 'tw', 'me', 'theta']
+  Target weights: {'qw': 3.0, 'pw': 1.0, 'tw': 1.0, 'me': 1.0, 'theta': 1.0}
+  Batch size: 4 (per GPU: 1)
+  Epochs: 300, LR: 0.001
+
+Loading data...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+Building partitioned datasets...
+Train partitions: (1184, 8192, 7)
+Val partitions:   (144, 8192, 7)
+Test partitions:  (152, 8192, 7)
+Partitions per solution: 8
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+Building partitioned datasets...
+Train partitions: (1184, 8192, 7)
+Val partitions:   (144, 8192, 7)
+Test partitions:  (152, 8192, 7)
+Partitions per solution: 8
+Model: 244,256 trainable parameters
+Prediction heads: ['qw', 'pw', 'tw', 'me', 'theta']
+torch.compile applied
+
+  Ep |     Train |       Val |    qw MSE |    pw MSE |    tw MSE |        LR
+--------------------------------------------------------------------------------
+   1 |    2.0599 |    0.4451 |    0.0453 |    0.0456 |    0.0684 |  1.00e-03 *  (168.5s)
+   2 |    0.4284 |    0.2938 |    0.0320 |    0.0228 |    0.0502 |  1.00e-03 *  (95.6s)
+   3 |    0.3071 |    0.2373 |    0.0171 |    0.0268 |    0.0379 |  1.00e-03 *  (95.6s)
+   4 |    0.2481 |    0.1347 |    0.0083 |    0.0095 |    0.0174 |  1.00e-03 *  (95.5s)
+   5 |    0.2264 |    0.2549 |    0.0266 |    0.0239 |    0.0457 |  1.00e-03  (95.6s)
+  10 |    0.1671 |    0.2414 |    0.0374 |    0.0136 |    0.0276 |  1.00e-03  (95.4s)
+  14 |    0.1136 |    0.0907 |    0.0045 |    0.0065 |    0.0098 |  1.00e-03 *  (95.8s)
+
+============================================
+Job completed: Thu Mar 12 06:32:45 AM CDT 2026
+============================================

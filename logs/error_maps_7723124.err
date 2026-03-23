@@ -1,0 +1,39 @@
+Traceback (most recent call last):
+  File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/create_error_maps.py", line 353, in <module>
+    main()
+  File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/create_error_maps.py", line 324, in main
+    model.load_state_dict(cleaned)
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 2584, in load_state_dict
+    raise RuntimeError(
+RuntimeError: Error(s) in loading state_dict for MambaAutoencoder:
+	Unexpected key(s) in state_dict: "pred_heads.pw.net.0.weight", "pred_heads.pw.net.0.bias", "pred_heads.pw.net.2.weight", "pred_heads.pw.net.2.bias", "pred_heads.pw.net.3.weight", "pred_heads.pw.net.3.bias", "pred_heads.tw.net.0.weight", "pred_heads.tw.net.0.bias", "pred_heads.tw.net.2.weight", "pred_heads.tw.net.2.bias", "pred_heads.tw.net.3.weight", "pred_heads.tw.net.3.bias", "pred_heads.me.net.0.weight", "pred_heads.me.net.0.bias", "pred_heads.me.net.2.weight", "pred_heads.me.net.2.bias", "pred_heads.me.net.3.weight", "pred_heads.me.net.3.bias", "pred_heads.theta.net.0.weight", "pred_heads.theta.net.0.bias", "pred_heads.theta.net.2.weight", "pred_heads.theta.net.2.bias", "pred_heads.theta.net.3.weight", "pred_heads.theta.net.3.bias". 
+E0320 00:58:14.650000 1927051 torch/distributed/elastic/multiprocessing/api.py:869] failed (exitcode: 1) local_rank: 0 (pid: 1927060) of binary: /opt/apps/software/Miniforge3/24.1.2-0/bin/python
+Traceback (most recent call last):
+  File "/home/kzz1/.local/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 355, in wrapper
+    return f(*args, **kwargs)
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/run.py", line 919, in main
+    run(args)
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/run.py", line 910, in run
+    elastic_launch(
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/launcher/api.py", line 138, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/launcher/api.py", line 269, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+create_error_maps.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-03-20_00:58:14
+  host      : bc13u30n1.nots.rice.edu
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 1927060)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

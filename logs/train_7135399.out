@@ -1,0 +1,209 @@
+============================================
+Job ID: 7135399
+Node:   bb7u15g1
+GPUs:   0,1,2,3
+Date:   Thu Mar 12 06:01:47 AM CDT 2026
+============================================
+
+Starting training with  GPUs...
+
+============================================================
+  Mamba Autoencoder CFD — DDP
+============================================================
+  Device: cuda:0
+  GPU: NVIDIA L40S
+  VRAM: 47.6 GB
+  World size: 4
+  Block type: mamba3
+  seq_len: 8192, partitions: 8
+  d_model: 64, d_state: 64, n_layers: 4
+  Targets: ['qw', 'pw', 'tw', 'me', 'theta']
+  Target weights: {'qw': 3.0, 'pw': 1.0, 'tw': 1.0, 'me': 1.0, 'theta': 1.0}
+  Batch size: 4 (per GPU: 1)
+  Epochs: 300, LR: 0.001
+
+Loading data...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+Building partitioned datasets...
+Train partitions: (1184, 8192, 7)
+Val partitions:   (144, 8192, 7)
+Test partitions:  (152, 8192, 7)
+Partitions per solution: 8
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+Building partitioned datasets...
+Train partitions: (1184, 8192, 7)
+Val partitions:   (144, 8192, 7)
+Test partitions:  (152, 8192, 7)
+Partitions per solution: 8
+Model: 244,256 trainable parameters
+Prediction heads: ['qw', 'pw', 'tw', 'me', 'theta']
+torch.compile applied
+
+  Ep |     Train |       Val |    qw MSE |    pw MSE |    tw MSE |        LR
+--------------------------------------------------------------------------------
+   1 |    2.1351 |    0.4413 |    0.0430 |    0.0447 |    0.0630 |  1.00e-03 *  (145.1s)
+   2 |    0.4711 |    0.3563 |    0.0478 |    0.0253 |    0.0572 |  1.00e-03 *  (95.6s)
+   3 |    0.2907 |    0.2817 |    0.0241 |    0.0359 |    0.0401 |  1.00e-03 *  (95.8s)
+   4 |    0.2496 |    0.1545 |    0.0101 |    0.0154 |    0.0178 |  1.00e-03 *  (95.9s)
+   5 |    0.2047 |    0.4274 |    0.0534 |    0.0416 |    0.1009 |  1.00e-03  (95.8s)
+   8 |    0.2737 |    0.1457 |    0.0084 |    0.0097 |    0.0158 |  1.00e-03 *  (95.5s)
+  10 |    0.2784 |    0.2820 |    0.0337 |    0.0249 |    0.0292 |  1.00e-03  (95.9s)
+  18 |    0.1599 |    0.1379 |    0.0118 |    0.0089 |    0.0149 |  1.00e-03 *  (95.5s)
+  20 |    0.3132 |    0.3678 |    0.0344 |    0.0357 |    0.0457 |  1.00e-03  (95.4s)
+  30 |    3.5759 |    4.4159 |    0.6444 |    0.6917 |    0.6340 |  5.00e-04  (95.6s)
+  40 |    7.0994 |    5.1306 |    0.5745 |    0.9093 |    1.0093 |  2.50e-04  (95.5s)
+
+Early stopping at epoch 43
+
+Training complete in 69.3 minutes. Best val loss: 0.1379
+
+============================================================
+  EVALUATION ON TEST SET
+============================================================
+
+============================================================
+  Heat Flux qw (W/m²) — MAMBA3 RESULTS
+============================================================
+  MAE:          40,125
+  RMSE:         68,764
+  Within ±1%:   9.3%
+  Within ±3%:   27.5%
+  Within ±5%:   44.7%
+  Within ±10%:  73.2%
+  Median error:  5.75%
+  95th %%ile:    23.6%
+
+============================================================
+  Pressure pw (Pa) — MAMBA3 RESULTS
+============================================================
+  MAE:          849
+  RMSE:         1,780
+  Within ±1%:   7.9%
+  Within ±3%:   23.8%
+  Within ±5%:   41.4%
+  Within ±10%:  69.1%
+  Median error:  6.16%
+  95th %%ile:    26.2%
+
+============================================================
+  Shear Stress τw (Pa) — MAMBA3 RESULTS
+============================================================
+  MAE:          4
+  RMSE:         9
+  Within ±1%:   9.3%
+  Within ±3%:   25.9%
+  Within ±5%:   40.6%
+  Within ±10%:  69.2%
+  Median error:  6.41%
+  95th %%ile:    25.1%
+
+============================================================
+  Edge Mach Me (-) — MAMBA3 RESULTS
+============================================================
+  MAE:          0
+  RMSE:         0
+  Within ±1%:   11.7%
+  Within ±3%:   39.4%
+  Within ±5%:   66.5%
+  Within ±10%:  92.6%
+  Median error:  3.76%
+  95th %%ile:    11.5%
+
+============================================================
+  Momentum Thickness θ (m) — MAMBA3 RESULTS
+============================================================
+  MAE:          0
+  RMSE:         0
+  Within ±1%:   11.4%
+  Within ±3%:   32.4%
+  Within ±5%:   49.7%
+  Within ±10%:  77.3%
+  Median error:  5.04%
+  95th %%ile:    20.6%
+Saved training curves to results/run_7135399/training_curves.png
+Saved evaluation plots to results/run_7135399/evaluation_plots.png
+
+Results saved to results/run_7135399/
+
+============================================
+Job completed: Thu Mar 12 07:13:07 AM CDT 2026
+============================================
+
+=== RESULTS SUMMARY ===
+block_type: mamba3
+seq_len: 8192
+n_partitions: 8
+d_model: 64
+d_state: 64
+n_layers: 4
+latent_dim: 16
+targets: ['qw', 'pw', 'tw', 'me', 'theta']
+target_weights: {'qw': 3.0, 'pw': 1.0, 'tw': 1.0, 'me': 1.0, 'theta': 1.0}
+batch_size: 4
+epochs_run: 43
+best_val_loss: 0.137905
+training_time_min: 69.3
+world_size: 4
+
+qw:
+  MAE: 40,125
+  RMSE: 68,764
+  pct_1: 9.3%
+  pct_5: 44.7%
+  pct_10: 73.2%
+  median_err: 5.75%
+  q95_err: 23.6%
+
+pw:
+  MAE: 849
+  RMSE: 1,780
+  pct_1: 7.9%
+  pct_5: 41.4%
+  pct_10: 69.1%
+  median_err: 6.16%
+  q95_err: 26.2%
+
+tw:
+  MAE: 4
+  RMSE: 9
+  pct_1: 9.3%
+  pct_5: 40.6%
+  pct_10: 69.2%
+  median_err: 6.41%
+  q95_err: 25.1%
+
+me:
+  MAE: 0
+  RMSE: 0
+  pct_1: 11.7%
+  pct_5: 66.5%
+  pct_10: 92.6%
+  median_err: 3.76%
+  q95_err: 11.5%
+
+theta:
+  MAE: 0
+  RMSE: 0
+  pct_1: 11.4%
+  pct_5: 49.7%
+  pct_10: 77.3%
+  median_err: 5.04%
+  q95_err: 20.6%
+
+Results in: results/run_7135399

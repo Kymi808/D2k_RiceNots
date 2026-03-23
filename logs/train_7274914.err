@@ -1,0 +1,655 @@
+Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/__init__.py", line 898, in <module>
+    raise ImportError(
+ImportError: Failed to load PyTorch C extensions:
+    It appears that PyTorch has loaded the `torch/_C` folder
+    of the PyTorch repository rather than the C extensions which
+    are expected in the `torch._C` namespace. This can occur when
+    using the `install` workflow. e.g.
+        $ python setup.py install && python -c "import torch"
+
+    This error can generally be solved using the `develop` workflow
+        $ python setup.py develop && python -c "import torch"  # This should succeed
+    or by running Python from a different directory.
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/__init__.py", line 898, in <module>
+    raise ImportError(
+ImportError: Failed to load PyTorch C extensions:
+    It appears that PyTorch has loaded the `torch/_C` folder
+    of the PyTorch repository rather than the C extensions which
+    are expected in the `torch._C` namespace. This can occur when
+    using the `install` workflow. e.g.
+        $ python setup.py install && python -c "import torch"
+
+    This error can generally be solved using the `develop` workflow
+        $ python setup.py develop && python -c "import torch"  # This should succeed
+    or by running Python from a different directory.
+[W314 00:02:12.531704358 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[W314 00:02:12.542149538 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[W314 00:02:12.565554860 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[W314 00:02:12.625638918 CUDAAllocatorConfig.h:28] Warning: expandable_segments not supported on this platform (function operator())
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1446, in _call_user_compiler
+[rank0]:     compiled_fn = compiler_fn(gm, self.example_inputs())
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/repro/after_dynamo.py", line 129, in __call__
+[rank0]:     compiled_gm = compiler_fn(gm, example_inputs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/__init__.py", line 2234, in __call__
+[rank0]:     return compile_fx(model_, inputs_, config_patches=self.config)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1521, in compile_fx
+[rank0]:     return aot_autograd(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/backends/common.py", line 72, in __call__
+[rank0]:     cg = aot_module_simplified(gm, example_inputs, **self.kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 1071, in aot_module_simplified
+[rank0]:     compiled_fn = dispatch_and_compile()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 1056, in dispatch_and_compile
+[rank0]:     compiled_fn, _ = create_aot_dispatcher_function(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 522, in create_aot_dispatcher_function
+[rank0]:     return _create_aot_dispatcher_function(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 759, in _create_aot_dispatcher_function
+[rank0]:     compiled_fn, fw_metadata = compiler_fn(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/_aot_autograd/jit_compile_runtime_wrappers.py", line 588, in aot_dispatch_autograd
+[rank0]:     compiled_fw_func = aot_config.fw_compiler(fw_module, adjusted_flat_args)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1350, in fw_compiler_base
+[rank0]:     return _fw_compiler_base(model, example_inputs, is_inference)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1421, in _fw_compiler_base
+[rank0]:     return inner_compile(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 475, in compile_fx_inner
+[rank0]:     return wrap_compiler_debug(_compile_fx_inner, compiler_name="inductor")(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/repro/after_aot.py", line 85, in debug_wrapper
+[rank0]:     inner_compiled_fn = compiler_fn(gm, example_inputs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 661, in _compile_fx_inner
+[rank0]:     compiled_graph = FxGraphCache.load(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 1334, in load
+[rank0]:     compiled_graph = compile_fx_fn(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 570, in codegen_and_compile
+[rank0]:     compiled_graph = fx_codegen_and_compile(gm, example_inputs, **fx_kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 878, in fx_codegen_and_compile
+[rank0]:     compiled_fn = graph.compile_to_fn()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1913, in compile_to_fn
+[rank0]:     return self.compile_to_module().call
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1839, in compile_to_module
+[rank0]:     return self._compile_to_module()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1845, in _compile_to_module
+[rank0]:     self.codegen_with_cpp_wrapper() if self.cpp_wrapper else self.codegen()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1784, in codegen
+[rank0]:     self.scheduler.codegen()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 3383, in codegen
+[rank0]:     return self._codegen()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 3461, in _codegen
+[rank0]:     self.get_backend(device).codegen_node(node)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codegen/cpp.py", line 4468, in codegen_node
+[rank0]:     cpp_kernel_proxy = CppKernelProxy(kernel_group)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codegen/cpp.py", line 3466, in __init__
+[rank0]:     self.picked_vec_isa: cpu_vec_isa.VecISA = cpu_vec_isa.pick_vec_isa()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 360, in pick_vec_isa
+[rank0]:     _valid_vec_isa_list: List[VecISA] = valid_vec_isa_list()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 350, in valid_vec_isa_list
+[rank0]:     if all(flag in _cpu_supported_x86_isa for flag in str(isa).split()) and isa:
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 215, in __bool__
+[rank0]:     if super().__bool__():
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 148, in __bool__
+[rank0]:     return self.check_build(VecISA._avx_code)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 101, in check_build
+[rank0]:     extra=_get_isa_dry_compile_fingerprint(self._arch_flags),
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 27, in _get_isa_dry_compile_fingerprint
+[rank0]:     compiler_info = get_compiler_version_info(get_cpp_compiler())
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpp_builder.py", line 154, in get_cpp_compiler
+[rank0]:     compiler = cpp_compiler_search(search)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpp_builder.py", line 94, in cpp_compiler_search
+[rank0]:     raise exc.InvalidCxxCompiler
+[rank0]: torch._inductor.exc.InvalidCxxCompiler: No working C++ compiler found in torch._inductor.config.cpp.cxx: (None, 'g++')
+
+[rank0]: The above exception was the direct cause of the following exception:
+
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 435, in <module>
+[rank0]:     main()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 324, in main
+[rank0]:     train_losses = train_epoch(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 108, in train_epoch
+[rank0]:     out = model(X_batch)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/parallel/distributed.py", line 1643, in forward
+[rank0]:     else self._run_ddp_forward(*inputs, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/parallel/distributed.py", line 1459, in _run_ddp_forward
+[rank0]:     return self.module(*inputs, **kwargs)  # type: ignore[index]
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 465, in _fn
+[rank0]:     return fn(*args, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1269, in __call__
+[rank0]:     return self._torchdynamo_orig_callable(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1064, in __call__
+[rank0]:     result = self._inner_convert(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 526, in __call__
+[rank0]:     return _compile(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 924, in _compile
+[rank0]:     guarded_code = compile_inner(code, one_graph, hooks, transform)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 666, in compile_inner
+[rank0]:     return _compile_inner(code, one_graph, hooks, transform)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_utils_internal.py", line 87, in wrapper_function
+[rank0]:     return function(*args, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 699, in _compile_inner
+[rank0]:     out_code = transform_code_object(code, transform)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/bytecode_transformation.py", line 1322, in transform_code_object
+[rank0]:     transformations(instructions, code_options)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 219, in _fn
+[rank0]:     return fn(*args, **kwargs)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 634, in transform
+[rank0]:     tracer.run()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2796, in run
+[rank0]:     super().run()
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 983, in run
+[rank0]:     while self.step():
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 895, in step
+[rank0]:     self.dispatch_table[inst.opcode](self, inst)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2987, in RETURN_VALUE
+[rank0]:     self._return(inst)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2972, in _return
+[rank0]:     self.output.compile_subgraph(
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1142, in compile_subgraph
+[rank0]:     self.compile_and_call_fx_graph(tx, pass2.graph_output_vars(), root)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1369, in compile_and_call_fx_graph
+[rank0]:     compiled_fn = self.call_user_compiler(gm)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1416, in call_user_compiler
+[rank0]:     return self._call_user_compiler(gm)
+[rank0]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1465, in _call_user_compiler
+[rank0]:     raise BackendCompilerFailed(self.compiler_fn, e) from e
+[rank0]: torch._dynamo.exc.BackendCompilerFailed: backend='inductor' raised:
+[rank0]: InvalidCxxCompiler: No working C++ compiler found in torch._inductor.config.cpp.cxx: (None, 'g++')
+
+[rank0]: Set TORCH_LOGS="+dynamo" and TORCHDYNAMO_VERBOSE=1 for more information
+
+
+[rank0]: You can suppress this exception and fall back to eager by setting:
+[rank0]:     import torch._dynamo
+[rank0]:     torch._dynamo.config.suppress_errors = True
+
+[rank2]: Traceback (most recent call last):
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1446, in _call_user_compiler
+[rank2]:     compiled_fn = compiler_fn(gm, self.example_inputs())
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/repro/after_dynamo.py", line 129, in __call__
+[rank2]:     compiled_gm = compiler_fn(gm, example_inputs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/__init__.py", line 2234, in __call__
+[rank2]:     return compile_fx(model_, inputs_, config_patches=self.config)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1521, in compile_fx
+[rank2]:     return aot_autograd(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/backends/common.py", line 72, in __call__
+[rank2]:     cg = aot_module_simplified(gm, example_inputs, **self.kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 1071, in aot_module_simplified
+[rank2]:     compiled_fn = dispatch_and_compile()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 1056, in dispatch_and_compile
+[rank2]:     compiled_fn, _ = create_aot_dispatcher_function(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 522, in create_aot_dispatcher_function
+[rank2]:     return _create_aot_dispatcher_function(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 759, in _create_aot_dispatcher_function
+[rank2]:     compiled_fn, fw_metadata = compiler_fn(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/_aot_autograd/jit_compile_runtime_wrappers.py", line 588, in aot_dispatch_autograd
+[rank2]:     compiled_fw_func = aot_config.fw_compiler(fw_module, adjusted_flat_args)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1350, in fw_compiler_base
+[rank2]:     return _fw_compiler_base(model, example_inputs, is_inference)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1421, in _fw_compiler_base
+[rank2]:     return inner_compile(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 475, in compile_fx_inner
+[rank2]:     return wrap_compiler_debug(_compile_fx_inner, compiler_name="inductor")(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/repro/after_aot.py", line 85, in debug_wrapper
+[rank2]:     inner_compiled_fn = compiler_fn(gm, example_inputs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 661, in _compile_fx_inner
+[rank2]:     compiled_graph = FxGraphCache.load(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 1334, in load
+[rank2]:     compiled_graph = compile_fx_fn(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 570, in codegen_and_compile
+[rank2]:     compiled_graph = fx_codegen_and_compile(gm, example_inputs, **fx_kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 878, in fx_codegen_and_compile
+[rank2]:     compiled_fn = graph.compile_to_fn()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1913, in compile_to_fn
+[rank2]:     return self.compile_to_module().call
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1839, in compile_to_module
+[rank2]:     return self._compile_to_module()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1845, in _compile_to_module
+[rank2]:     self.codegen_with_cpp_wrapper() if self.cpp_wrapper else self.codegen()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1784, in codegen
+[rank2]:     self.scheduler.codegen()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 3383, in codegen
+[rank2]:     return self._codegen()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 3461, in _codegen
+[rank2]:     self.get_backend(device).codegen_node(node)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codegen/cpp.py", line 4468, in codegen_node
+[rank2]:     cpp_kernel_proxy = CppKernelProxy(kernel_group)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codegen/cpp.py", line 3466, in __init__
+[rank2]:     self.picked_vec_isa: cpu_vec_isa.VecISA = cpu_vec_isa.pick_vec_isa()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 360, in pick_vec_isa
+[rank2]:     _valid_vec_isa_list: List[VecISA] = valid_vec_isa_list()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 350, in valid_vec_isa_list
+[rank2]:     if all(flag in _cpu_supported_x86_isa for flag in str(isa).split()) and isa:
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 215, in __bool__
+[rank2]:     if super().__bool__():
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 148, in __bool__
+[rank2]:     return self.check_build(VecISA._avx_code)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 101, in check_build
+[rank2]:     extra=_get_isa_dry_compile_fingerprint(self._arch_flags),
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 27, in _get_isa_dry_compile_fingerprint
+[rank2]:     compiler_info = get_compiler_version_info(get_cpp_compiler())
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpp_builder.py", line 154, in get_cpp_compiler
+[rank2]:     compiler = cpp_compiler_search(search)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpp_builder.py", line 94, in cpp_compiler_search
+[rank2]:     raise exc.InvalidCxxCompiler
+[rank2]: torch._inductor.exc.InvalidCxxCompiler: No working C++ compiler found in torch._inductor.config.cpp.cxx: (None, 'g++')
+
+[rank2]: The above exception was the direct cause of the following exception:
+
+[rank2]: Traceback (most recent call last):
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 435, in <module>
+[rank2]:     main()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 324, in main
+[rank2]:     train_losses = train_epoch(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 108, in train_epoch
+[rank2]:     out = model(X_batch)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank2]:     return self._call_impl(*args, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank2]:     return forward_call(*args, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/parallel/distributed.py", line 1643, in forward
+[rank2]:     else self._run_ddp_forward(*inputs, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/parallel/distributed.py", line 1459, in _run_ddp_forward
+[rank2]:     return self.module(*inputs, **kwargs)  # type: ignore[index]
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank2]:     return self._call_impl(*args, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank2]:     return forward_call(*args, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 465, in _fn
+[rank2]:     return fn(*args, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank2]:     return self._call_impl(*args, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank2]:     return forward_call(*args, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1269, in __call__
+[rank2]:     return self._torchdynamo_orig_callable(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1064, in __call__
+[rank2]:     result = self._inner_convert(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 526, in __call__
+[rank2]:     return _compile(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 924, in _compile
+[rank2]:     guarded_code = compile_inner(code, one_graph, hooks, transform)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 666, in compile_inner
+[rank2]:     return _compile_inner(code, one_graph, hooks, transform)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_utils_internal.py", line 87, in wrapper_function
+[rank2]:     return function(*args, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 699, in _compile_inner
+[rank2]:     out_code = transform_code_object(code, transform)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/bytecode_transformation.py", line 1322, in transform_code_object
+[rank2]:     transformations(instructions, code_options)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 219, in _fn
+[rank2]:     return fn(*args, **kwargs)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 634, in transform
+[rank2]:     tracer.run()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2796, in run
+[rank2]:     super().run()
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 983, in run
+[rank2]:     while self.step():
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 895, in step
+[rank2]:     self.dispatch_table[inst.opcode](self, inst)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2987, in RETURN_VALUE
+[rank2]:     self._return(inst)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2972, in _return
+[rank2]:     self.output.compile_subgraph(
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1142, in compile_subgraph
+[rank2]:     self.compile_and_call_fx_graph(tx, pass2.graph_output_vars(), root)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1369, in compile_and_call_fx_graph
+[rank2]:     compiled_fn = self.call_user_compiler(gm)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1416, in call_user_compiler
+[rank2]:     return self._call_user_compiler(gm)
+[rank2]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1465, in _call_user_compiler
+[rank2]:     raise BackendCompilerFailed(self.compiler_fn, e) from e
+[rank2]: torch._dynamo.exc.BackendCompilerFailed: backend='inductor' raised:
+[rank2]: InvalidCxxCompiler: No working C++ compiler found in torch._inductor.config.cpp.cxx: (None, 'g++')
+
+[rank2]: Set TORCH_LOGS="+dynamo" and TORCHDYNAMO_VERBOSE=1 for more information
+
+
+[rank2]: You can suppress this exception and fall back to eager by setting:
+[rank2]:     import torch._dynamo
+[rank2]:     torch._dynamo.config.suppress_errors = True
+
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1446, in _call_user_compiler
+[rank1]:     compiled_fn = compiler_fn(gm, self.example_inputs())
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/repro/after_dynamo.py", line 129, in __call__
+[rank1]:     compiled_gm = compiler_fn(gm, example_inputs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/__init__.py", line 2234, in __call__
+[rank1]:     return compile_fx(model_, inputs_, config_patches=self.config)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1521, in compile_fx
+[rank1]:     return aot_autograd(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/backends/common.py", line 72, in __call__
+[rank1]:     cg = aot_module_simplified(gm, example_inputs, **self.kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 1071, in aot_module_simplified
+[rank1]:     compiled_fn = dispatch_and_compile()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 1056, in dispatch_and_compile
+[rank1]:     compiled_fn, _ = create_aot_dispatcher_function(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 522, in create_aot_dispatcher_function
+[rank1]:     return _create_aot_dispatcher_function(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 759, in _create_aot_dispatcher_function
+[rank1]:     compiled_fn, fw_metadata = compiler_fn(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/_aot_autograd/jit_compile_runtime_wrappers.py", line 588, in aot_dispatch_autograd
+[rank1]:     compiled_fw_func = aot_config.fw_compiler(fw_module, adjusted_flat_args)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1350, in fw_compiler_base
+[rank1]:     return _fw_compiler_base(model, example_inputs, is_inference)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1421, in _fw_compiler_base
+[rank1]:     return inner_compile(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 475, in compile_fx_inner
+[rank1]:     return wrap_compiler_debug(_compile_fx_inner, compiler_name="inductor")(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/repro/after_aot.py", line 85, in debug_wrapper
+[rank1]:     inner_compiled_fn = compiler_fn(gm, example_inputs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 661, in _compile_fx_inner
+[rank1]:     compiled_graph = FxGraphCache.load(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 1334, in load
+[rank1]:     compiled_graph = compile_fx_fn(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 570, in codegen_and_compile
+[rank1]:     compiled_graph = fx_codegen_and_compile(gm, example_inputs, **fx_kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 878, in fx_codegen_and_compile
+[rank1]:     compiled_fn = graph.compile_to_fn()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1913, in compile_to_fn
+[rank1]:     return self.compile_to_module().call
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1839, in compile_to_module
+[rank1]:     return self._compile_to_module()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1845, in _compile_to_module
+[rank1]:     self.codegen_with_cpp_wrapper() if self.cpp_wrapper else self.codegen()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1784, in codegen
+[rank1]:     self.scheduler.codegen()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 3383, in codegen
+[rank1]:     return self._codegen()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 3461, in _codegen
+[rank1]:     self.get_backend(device).codegen_node(node)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codegen/cpp.py", line 4468, in codegen_node
+[rank1]:     cpp_kernel_proxy = CppKernelProxy(kernel_group)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codegen/cpp.py", line 3466, in __init__
+[rank1]:     self.picked_vec_isa: cpu_vec_isa.VecISA = cpu_vec_isa.pick_vec_isa()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 360, in pick_vec_isa
+[rank1]:     _valid_vec_isa_list: List[VecISA] = valid_vec_isa_list()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 350, in valid_vec_isa_list
+[rank1]:     if all(flag in _cpu_supported_x86_isa for flag in str(isa).split()) and isa:
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 215, in __bool__
+[rank1]:     if super().__bool__():
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 148, in __bool__
+[rank1]:     return self.check_build(VecISA._avx_code)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 101, in check_build
+[rank1]:     extra=_get_isa_dry_compile_fingerprint(self._arch_flags),
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 27, in _get_isa_dry_compile_fingerprint
+[rank1]:     compiler_info = get_compiler_version_info(get_cpp_compiler())
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpp_builder.py", line 154, in get_cpp_compiler
+[rank1]:     compiler = cpp_compiler_search(search)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpp_builder.py", line 94, in cpp_compiler_search
+[rank1]:     raise exc.InvalidCxxCompiler
+[rank1]: torch._inductor.exc.InvalidCxxCompiler: No working C++ compiler found in torch._inductor.config.cpp.cxx: (None, 'g++')
+
+[rank1]: The above exception was the direct cause of the following exception:
+
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 435, in <module>
+[rank1]:     main()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 324, in main
+[rank1]:     train_losses = train_epoch(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 108, in train_epoch
+[rank1]:     out = model(X_batch)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank1]:     return self._call_impl(*args, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank1]:     return forward_call(*args, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/parallel/distributed.py", line 1643, in forward
+[rank1]:     else self._run_ddp_forward(*inputs, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/parallel/distributed.py", line 1459, in _run_ddp_forward
+[rank1]:     return self.module(*inputs, **kwargs)  # type: ignore[index]
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank1]:     return self._call_impl(*args, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank1]:     return forward_call(*args, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 465, in _fn
+[rank1]:     return fn(*args, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank1]:     return self._call_impl(*args, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank1]:     return forward_call(*args, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1269, in __call__
+[rank1]:     return self._torchdynamo_orig_callable(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1064, in __call__
+[rank1]:     result = self._inner_convert(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 526, in __call__
+[rank1]:     return _compile(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 924, in _compile
+[rank1]:     guarded_code = compile_inner(code, one_graph, hooks, transform)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 666, in compile_inner
+[rank1]:     return _compile_inner(code, one_graph, hooks, transform)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_utils_internal.py", line 87, in wrapper_function
+[rank1]:     return function(*args, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 699, in _compile_inner
+[rank1]:     out_code = transform_code_object(code, transform)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/bytecode_transformation.py", line 1322, in transform_code_object
+[rank1]:     transformations(instructions, code_options)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 219, in _fn
+[rank1]:     return fn(*args, **kwargs)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 634, in transform
+[rank1]:     tracer.run()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2796, in run
+[rank1]:     super().run()
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 983, in run
+[rank1]:     while self.step():
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 895, in step
+[rank1]:     self.dispatch_table[inst.opcode](self, inst)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2987, in RETURN_VALUE
+[rank1]:     self._return(inst)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2972, in _return
+[rank1]:     self.output.compile_subgraph(
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1142, in compile_subgraph
+[rank1]:     self.compile_and_call_fx_graph(tx, pass2.graph_output_vars(), root)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1369, in compile_and_call_fx_graph
+[rank1]:     compiled_fn = self.call_user_compiler(gm)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1416, in call_user_compiler
+[rank1]:     return self._call_user_compiler(gm)
+[rank1]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1465, in _call_user_compiler
+[rank1]:     raise BackendCompilerFailed(self.compiler_fn, e) from e
+[rank1]: torch._dynamo.exc.BackendCompilerFailed: backend='inductor' raised:
+[rank1]: InvalidCxxCompiler: No working C++ compiler found in torch._inductor.config.cpp.cxx: (None, 'g++')
+
+[rank1]: Set TORCH_LOGS="+dynamo" and TORCHDYNAMO_VERBOSE=1 for more information
+
+
+[rank1]: You can suppress this exception and fall back to eager by setting:
+[rank1]:     import torch._dynamo
+[rank1]:     torch._dynamo.config.suppress_errors = True
+
+[rank3]: Traceback (most recent call last):
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1446, in _call_user_compiler
+[rank3]:     compiled_fn = compiler_fn(gm, self.example_inputs())
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/repro/after_dynamo.py", line 129, in __call__
+[rank3]:     compiled_gm = compiler_fn(gm, example_inputs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/__init__.py", line 2234, in __call__
+[rank3]:     return compile_fx(model_, inputs_, config_patches=self.config)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1521, in compile_fx
+[rank3]:     return aot_autograd(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/backends/common.py", line 72, in __call__
+[rank3]:     cg = aot_module_simplified(gm, example_inputs, **self.kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 1071, in aot_module_simplified
+[rank3]:     compiled_fn = dispatch_and_compile()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 1056, in dispatch_and_compile
+[rank3]:     compiled_fn, _ = create_aot_dispatcher_function(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 522, in create_aot_dispatcher_function
+[rank3]:     return _create_aot_dispatcher_function(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/aot_autograd.py", line 759, in _create_aot_dispatcher_function
+[rank3]:     compiled_fn, fw_metadata = compiler_fn(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_functorch/_aot_autograd/jit_compile_runtime_wrappers.py", line 588, in aot_dispatch_autograd
+[rank3]:     compiled_fw_func = aot_config.fw_compiler(fw_module, adjusted_flat_args)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1350, in fw_compiler_base
+[rank3]:     return _fw_compiler_base(model, example_inputs, is_inference)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 1421, in _fw_compiler_base
+[rank3]:     return inner_compile(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 475, in compile_fx_inner
+[rank3]:     return wrap_compiler_debug(_compile_fx_inner, compiler_name="inductor")(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/repro/after_aot.py", line 85, in debug_wrapper
+[rank3]:     inner_compiled_fn = compiler_fn(gm, example_inputs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 661, in _compile_fx_inner
+[rank3]:     compiled_graph = FxGraphCache.load(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codecache.py", line 1334, in load
+[rank3]:     compiled_graph = compile_fx_fn(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 570, in codegen_and_compile
+[rank3]:     compiled_graph = fx_codegen_and_compile(gm, example_inputs, **fx_kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/compile_fx.py", line 878, in fx_codegen_and_compile
+[rank3]:     compiled_fn = graph.compile_to_fn()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1913, in compile_to_fn
+[rank3]:     return self.compile_to_module().call
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1839, in compile_to_module
+[rank3]:     return self._compile_to_module()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1845, in _compile_to_module
+[rank3]:     self.codegen_with_cpp_wrapper() if self.cpp_wrapper else self.codegen()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/graph.py", line 1784, in codegen
+[rank3]:     self.scheduler.codegen()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 3383, in codegen
+[rank3]:     return self._codegen()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/scheduler.py", line 3461, in _codegen
+[rank3]:     self.get_backend(device).codegen_node(node)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codegen/cpp.py", line 4468, in codegen_node
+[rank3]:     cpp_kernel_proxy = CppKernelProxy(kernel_group)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/codegen/cpp.py", line 3466, in __init__
+[rank3]:     self.picked_vec_isa: cpu_vec_isa.VecISA = cpu_vec_isa.pick_vec_isa()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 360, in pick_vec_isa
+[rank3]:     _valid_vec_isa_list: List[VecISA] = valid_vec_isa_list()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 350, in valid_vec_isa_list
+[rank3]:     if all(flag in _cpu_supported_x86_isa for flag in str(isa).split()) and isa:
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 215, in __bool__
+[rank3]:     if super().__bool__():
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 148, in __bool__
+[rank3]:     return self.check_build(VecISA._avx_code)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 101, in check_build
+[rank3]:     extra=_get_isa_dry_compile_fingerprint(self._arch_flags),
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpu_vec_isa.py", line 27, in _get_isa_dry_compile_fingerprint
+[rank3]:     compiler_info = get_compiler_version_info(get_cpp_compiler())
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpp_builder.py", line 154, in get_cpp_compiler
+[rank3]:     compiler = cpp_compiler_search(search)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_inductor/cpp_builder.py", line 94, in cpp_compiler_search
+[rank3]:     raise exc.InvalidCxxCompiler
+[rank3]: torch._inductor.exc.InvalidCxxCompiler: No working C++ compiler found in torch._inductor.config.cpp.cxx: (None, 'g++')
+
+[rank3]: The above exception was the direct cause of the following exception:
+
+[rank3]: Traceback (most recent call last):
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 435, in <module>
+[rank3]:     main()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 324, in main
+[rank3]:     train_losses = train_epoch(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/train.py", line 108, in train_epoch
+[rank3]:     out = model(X_batch)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank3]:     return self._call_impl(*args, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank3]:     return forward_call(*args, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/parallel/distributed.py", line 1643, in forward
+[rank3]:     else self._run_ddp_forward(*inputs, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/parallel/distributed.py", line 1459, in _run_ddp_forward
+[rank3]:     return self.module(*inputs, **kwargs)  # type: ignore[index]
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank3]:     return self._call_impl(*args, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank3]:     return forward_call(*args, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py", line 465, in _fn
+[rank3]:     return fn(*args, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+[rank3]:     return self._call_impl(*args, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+[rank3]:     return forward_call(*args, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1269, in __call__
+[rank3]:     return self._torchdynamo_orig_callable(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 1064, in __call__
+[rank3]:     result = self._inner_convert(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 526, in __call__
+[rank3]:     return _compile(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 924, in _compile
+[rank3]:     guarded_code = compile_inner(code, one_graph, hooks, transform)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 666, in compile_inner
+[rank3]:     return _compile_inner(code, one_graph, hooks, transform)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_utils_internal.py", line 87, in wrapper_function
+[rank3]:     return function(*args, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 699, in _compile_inner
+[rank3]:     out_code = transform_code_object(code, transform)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/bytecode_transformation.py", line 1322, in transform_code_object
+[rank3]:     transformations(instructions, code_options)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 219, in _fn
+[rank3]:     return fn(*args, **kwargs)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/convert_frame.py", line 634, in transform
+[rank3]:     tracer.run()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2796, in run
+[rank3]:     super().run()
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 983, in run
+[rank3]:     while self.step():
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 895, in step
+[rank3]:     self.dispatch_table[inst.opcode](self, inst)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2987, in RETURN_VALUE
+[rank3]:     self._return(inst)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/symbolic_convert.py", line 2972, in _return
+[rank3]:     self.output.compile_subgraph(
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1142, in compile_subgraph
+[rank3]:     self.compile_and_call_fx_graph(tx, pass2.graph_output_vars(), root)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1369, in compile_and_call_fx_graph
+[rank3]:     compiled_fn = self.call_user_compiler(gm)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1416, in call_user_compiler
+[rank3]:     return self._call_user_compiler(gm)
+[rank3]:   File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/_dynamo/output_graph.py", line 1465, in _call_user_compiler
+[rank3]:     raise BackendCompilerFailed(self.compiler_fn, e) from e
+[rank3]: torch._dynamo.exc.BackendCompilerFailed: backend='inductor' raised:
+[rank3]: InvalidCxxCompiler: No working C++ compiler found in torch._inductor.config.cpp.cxx: (None, 'g++')
+
+[rank3]: Set TORCH_LOGS="+dynamo" and TORCHDYNAMO_VERBOSE=1 for more information
+
+
+[rank3]: You can suppress this exception and fall back to eager by setting:
+[rank3]:     import torch._dynamo
+[rank3]:     torch._dynamo.config.suppress_errors = True
+
+[rank0]:[W314 00:03:05.661274951 ProcessGroupNCCL.cpp:1250] Warning: WARNING: process group has NOT been destroyed before we destruct ProcessGroupNCCL. On normal program exit, the application should call destroy_process_group to ensure that any pending NCCL operations have finished in this process. In rare cases this process can exit before this point and block the progress of another member of the process group. This constraint has always been present,  but this warning has only been added since PyTorch 2.4 (function operator())
+W0314 00:03:06.791000 1063066 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 1063069 closing signal SIGTERM
+W0314 00:03:06.791000 1063066 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 1063070 closing signal SIGTERM
+E0314 00:03:07.019000 1063066 torch/distributed/elastic/multiprocessing/api.py:869] failed (exitcode: 1) local_rank: 0 (pid: 1063068) of binary: /opt/apps/software/Miniforge3/24.1.2-0/bin/python
+Traceback (most recent call last):
+  File "/home/kzz1/.local/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 355, in wrapper
+    return f(*args, **kwargs)
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/run.py", line 919, in main
+    run(args)
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/run.py", line 910, in run
+    elastic_launch(
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/launcher/api.py", line 138, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/projects/dsci435/NASA_REENTRY_SP26/.conda/envs/mamba-cfd/lib/python3.11/site-packages/torch/distributed/launcher/api.py", line 269, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+train.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-03-14_00:03:06
+  host      : bb6u21g1.nots.rice.edu
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 1063071)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-03-14_00:03:06
+  host      : bb6u21g1.nots.rice.edu
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 1063068)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

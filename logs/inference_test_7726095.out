@@ -1,0 +1,171 @@
+============================================
+Job ID: 7726095  [PACKAGE + TEST]
+Date:   Fri Mar 20 03:31:54 AM CDT 2026
+============================================
+
+Step 1: Packaging best model...
+
+Loading data to extract scalers and mesh...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+Verifying model loads...
+
+Packaged model saved to packaged_model/
+  model_weights.pt    — 244,256 parameters
+  scaler_X.pkl        — input feature scaler
+  scaler_y.pkl        — target scaler (log10 + standardized)
+  mesh_xyz_sorted.npy — sorted capsule mesh (49698 points)
+  config.json         — model configuration
+
+Outputs: ['qw', 'pw', 'tw', 'me', 'theta']
+Ready for inference with inference.py
+
+Step 2: Running inference tests...
+
+============================================================
+  MAMBA CFD SURROGATE — INFERENCE TEST SUITE
+============================================================
+
+============================================================
+TEST 1: Model Loading
+============================================================
+MambaSurrogate loaded: 244,256 params, 49698 mesh points, outputs: ['qw', 'pw', 'tw', 'me', 'theta'], device: cuda
+  [PASS] Model loads without error
+  [PASS] Has expected outputs — outputs: ['qw', 'pw', 'tw', 'me', 'theta']
+  [PASS] Mesh has expected point count — n_points: 49698
+  [PASS] Partitions computed — n_partitions: 8
+
+============================================================
+TEST 2: Single Prediction
+============================================================
+  [PASS] Prediction completes
+  [PASS] Inference time reasonable — 3.49s
+  [PASS] qw in results
+  [PASS] qw shape correct — shape: (49698,)
+  [PASS] qw no NaN values — NaN count: 0
+  [PASS] qw no Inf values — Inf count: 0
+  [PASS] pw in results
+  [PASS] pw shape correct — shape: (49698,)
+  [PASS] pw no NaN values — NaN count: 0
+  [PASS] pw no Inf values — Inf count: 0
+  [PASS] tw in results
+  [PASS] tw shape correct — shape: (49698,)
+  [PASS] tw no NaN values — NaN count: 0
+  [PASS] tw no Inf values — Inf count: 0
+  [PASS] me in results
+  [PASS] me shape correct — shape: (49698,)
+  [PASS] me no NaN values — NaN count: 0
+  [PASS] me no Inf values — Inf count: 0
+  [PASS] theta in results
+  [PASS] theta shape correct — shape: (49698,)
+  [PASS] theta no NaN values — NaN count: 0
+  [PASS] theta no Inf values — Inf count: 0
+  [PASS] xyz in results
+  [PASS] xyz shape correct — shape: (49698, 3)
+
+============================================================
+TEST 3: Physical Plausibility
+============================================================
+
+  Condition: Low speed, high altitude
+  [PASS] Low speed, high altitude: qw mostly in bounds — 100.0% in [1e+02, 1e+07], range: [4.81e+03, 2.02e+05]
+  [PASS] Low speed, high altitude: pw mostly in bounds — 100.0% in [1e-01, 5e+05], range: [6.35e+00, 3.05e+03]
+  [PASS] Low speed, high altitude: tw mostly in bounds — 100.0% in [1e-03, 1e+03], range: [5.88e-01, 4.18e+01]
+  [PASS] Low speed, high altitude: me mostly in bounds — 100.0% in [1e-03, 6e+00], range: [7.78e-02, 3.29e+00]
+  [PASS] Low speed, high altitude: theta mostly in bounds — 100.0% in [1e-08, 1e-01], range: [4.67e-05, 1.19e-02]
+  [PASS] Low speed, high altitude: qw mean > 0 — mean qw: 44324 W/m^2
+
+  Condition: Mid speed, mid altitude
+  [PASS] Mid speed, mid altitude: qw mostly in bounds — 100.0% in [1e+02, 1e+07], range: [2.63e+04, 5.44e+06]
+  [PASS] Mid speed, mid altitude: pw mostly in bounds — 100.0% in [1e-01, 5e+05], range: [1.30e+02, 1.79e+05]
+  [PASS] Mid speed, mid altitude: tw mostly in bounds — 100.0% in [1e-03, 1e+03], range: [8.42e+00, 4.59e+02]
+  [PASS] Mid speed, mid altitude: me mostly in bounds — 100.0% in [1e-03, 6e+00], range: [2.91e-02, 3.18e+00]
+  [PASS] Mid speed, mid altitude: theta mostly in bounds — 100.0% in [1e-08, 1e-01], range: [4.12e-04, 2.23e-03]
+  [PASS] Mid speed, mid altitude: qw mean > 0 — mean qw: 1862846 W/m^2
+
+  Condition: High speed, low altitude
+  [PASS] High speed, low altitude: qw mostly in bounds — 100.0% in [1e+02, 1e+07], range: [8.19e+04, 4.42e+06]
+  [PASS] High speed, low altitude: pw mostly in bounds — 100.0% in [1e-01, 5e+05], range: [2.02e+03, 1.15e+05]
+  [PASS] High speed, low altitude: tw mostly in bounds — 100.0% in [1e-03, 1e+03], range: [2.16e+01, 3.71e+02]
+  [PASS] High speed, low altitude: me mostly in bounds — 100.0% in [1e-03, 6e+00], range: [4.84e-01, 1.90e+00]
+  [PASS] High speed, low altitude: theta mostly in bounds — 100.0% in [1e-08, 1e-01], range: [5.29e-04, 2.66e-03]
+  [PASS] High speed, low altitude: qw mean > 0 — mean qw: 2734043 W/m^2
+
+  Condition: Low AoA edge
+  [PASS] Low AoA edge: qw mostly in bounds — 100.0% in [1e+02, 1e+07], range: [1.16e+04, 2.13e+06]
+  [PASS] Low AoA edge: pw mostly in bounds — 100.0% in [1e-01, 5e+05], range: [5.27e+01, 7.37e+04]
+  [PASS] Low AoA edge: tw mostly in bounds — 100.0% in [1e-03, 1e+03], range: [1.13e+00, 2.70e+02]
+  [PASS] Low AoA edge: me mostly in bounds — 100.0% in [1e-03, 6e+00], range: [1.59e-02, 3.46e+00]
+  [PASS] Low AoA edge: theta mostly in bounds — 100.0% in [1e-08, 1e-01], range: [4.55e-05, 2.23e-03]
+  [PASS] Low AoA edge: qw mean > 0 — mean qw: 778368 W/m^2
+
+  Condition: High AoA edge
+  [PASS] High AoA edge: qw mostly in bounds — 100.0% in [1e+02, 1e+07], range: [7.06e+04, 5.97e+06]
+  [PASS] High AoA edge: pw mostly in bounds — 100.0% in [1e-01, 5e+05], range: [5.39e+02, 2.25e+05]
+  [PASS] High AoA edge: tw mostly in bounds — 100.0% in [1e-03, 1e+03], range: [2.38e+01, 4.95e+02]
+  [PASS] High AoA edge: me mostly in bounds — 100.0% in [1e-03, 6e+00], range: [1.00e-01, 3.09e+00]
+  [PASS] High AoA edge: theta mostly in bounds — 100.0% in [1e-08, 1e-01], range: [3.82e-04, 2.48e-03]
+  [PASS] High AoA edge: qw mean > 0 — mean qw: 2349203 W/m^2
+
+============================================================
+TEST 4: Monotonicity (Sanity Checks)
+============================================================
+  [PASS] qw increases with velocity (general trend) — mean qw at V=[4000.0, 6000.0, 8000.0, 10000.0]: ['980320', '1401683', '2047898', '2951045']
+  [PASS] qw increases with density (fixed velocity, consistent q_inf) — mean qw at rho=[0.0005, 0.001, 0.003, 0.006]: ['784178', '1101937', '1862846', '2074326']
+
+============================================================
+TEST 5: Consistency (Determinism)
+============================================================
+  [PASS] qw identical across runs — max diff: 0.00e+00
+  [PASS] pw identical across runs — max diff: 0.00e+00
+  [PASS] tw identical across runs — max diff: 0.00e+00
+  [PASS] me identical across runs — max diff: 0.00e+00
+  [PASS] theta identical across runs — max diff: 0.00e+00
+
+============================================================
+TEST 6: Spatial Pattern Checks
+============================================================
+  [FAIL] Peak qw near capsule centerline — peak qw at r=1.8918m, median r=1.6489m
+  [PASS] qw has spatial variation (not constant) — coefficient of variation: 0.51
+  [FAIL] Peak pw near capsule centerline — peak pw at r=1.8103m, median r=1.6489m
+
+============================================================
+TEST 7: Performance Benchmark
+============================================================
+  [PASS] Avg inference time (5 runs) — 3.278s +/- 0.000s
+  [PASS] Inference under 10s (CPU) or 2s (GPU) — device: cuda
+
+============================================================
+Generating Visualizations
+============================================================
+  Saved /projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/test_inference/results/inference_surface_maps.png
+  Running velocity sweep...
+  Saved /projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/test_inference/results/velocity_sweep.png
+  Saved /projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/test_inference/results/prediction_distributions.png
+  Running multi-condition comparison...
+  Saved /projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/test_inference/results/multi_condition_comparison.png
+
+============================================================
+  TEST SUMMARY
+============================================================
+  Passed: 68/70
+  Failed: 2/70
+  Avg inference time: 3.278s
+  Device: cuda
+
+  FAILED TESTS:
+    - Peak qw near capsule centerline: peak qw at r=1.8918m, median r=1.6489m
+    - Peak pw near capsule centerline: peak pw at r=1.8103m, median r=1.6489m
+
+  Results saved to /projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots/test_inference/results/
+
+============================================
+Completed: Fri Mar 20 03:34:43 AM CDT 2026
+============================================

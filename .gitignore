@@ -9,9 +9,7 @@ data/
 
 
 # Logs
-logs/
-wandb/
-*.log
+
 
 # Python
 __pycache__/
