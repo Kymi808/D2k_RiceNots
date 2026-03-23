@@ -120,9 +120,8 @@ def create_side_view(xyz, values, output_name):
                 color=log_vals,
                 colorscale='Jet',
                 colorbar=dict(
-                    title=f'log10({output_name})',
+                    title=dict(text=f'log10({output_name})', font=dict(color='white')),
                     tickfont=dict(color='white'),
-                    titlefont=dict(color='white'),
                 ),
                 cmin=np.percentile(log_vals, 1),
                 cmax=np.percentile(log_vals, 99),
@@ -152,6 +151,13 @@ def create_side_view(xyz, values, output_name):
 
 
 def main():
+    # Hide deploy button
+    st.markdown("""
+    <style>
+    [data-testid="stAppDeployButton"] {display: none;}
+    </style>
+    """, unsafe_allow_html=True)
+
     # Header
     st.markdown("""
     # Apollo Reentry CFD Surrogate Model
