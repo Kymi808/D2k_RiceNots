@@ -114,6 +114,26 @@ for v in [4000, 6000, 8000, 10000]:
     print(f"V={v}: max qw = {r['qw'].max():.0f} W/m^2")
 ```
 
+## Installation
+
+### Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+Requires Python 3.8+ and PyTorch 2.0+. GPU (CUDA) is optional — inference works on CPU (~60-120s) or GPU (~3s).
+
+### Data Setup
+
+The CFD database (`apollo_cfd_database.csv`, ~2.2GB) is not included in the repository due to its size. To set up:
+
+1. Create the data directory: `mkdir -p data/`
+2. Place `apollo_cfd_database.csv` in `data/`
+3. The CSV must contain columns: `X, Y, Z, velocity (m/s), density (kg/m^3), aoa (degrees), dynamic_pressure (Pa), qw (W/m^2), pw (Pa), tauw (Pa), Me, theta (m), Re-theta`
+4. Each solution must have exactly 50,176 mesh points
+
+The pretrained model in `packaged_model/` can be used for inference without the training data.
+
 ## Architecture
 
 **MambaAutoencoder** (244K parameters):
@@ -183,6 +203,8 @@ Key design choices:
 ├── create_error_maps.py       # Spatial error heatmap generation
 ├── package_model.py           # Package model for production deployment
 ├── inference.py               # Production inference wrapper (MambaSurrogate class)
+├── app.py                     # Interactive Streamlit 3D visualization demo
+├── requirements.txt           # Python dependencies
 ├── TECHNICAL_REFERENCE.md     # Comprehensive technical documentation
 ├── INFERENCE_GUIDE.md         # Inference API and deployment guide
 ├── slurm_*.sh                 # SLURM job scripts for NOTS cluster
