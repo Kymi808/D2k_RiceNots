@@ -8,6 +8,7 @@ from typing import List
 
 @dataclass
 class Config:
+    """Configuration for the Mamba CFD Surrogate model, data pipeline, and training."""
     # --- Data ---
     points_per_solution: int = 50176
     seq_len: int = 8192

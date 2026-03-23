@@ -14,11 +14,13 @@ from torch.utils.checkpoint import checkpoint
 # ============================================================
 
 def rotate_half(x):
+    """Rotate the second half of the last dimension for RoPE."""
     x1, x2 = x[..., :x.shape[-1]//2], x[..., x.shape[-1]//2:]
     return torch.cat((-x2, x1), dim=-1)
 
 
 def apply_rope(x, cos, sin):
+    """Apply rotary position encoding to tensor x."""
     return x * cos + rotate_half(x) * sin
 
 

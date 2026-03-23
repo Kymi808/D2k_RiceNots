@@ -47,11 +47,13 @@ def setup_ddp():
 
 
 def cleanup_ddp():
+    """Destroy the distributed process group if initialized."""
     if dist.is_initialized():
         dist.destroy_process_group()
 
 
 def is_main(rank):
+    """Returns True if this is the main process (rank 0)."""
     return rank == 0
 
 
@@ -97,6 +99,8 @@ def compute_loss(out, X_batch, Y_batch, cfg, y_col_names, y_weights,
 def train_epoch(model, dl, optimizer, scaler_amp, cfg, y_col_names, y_weights,
                 physics_loss_fn, scaler_X, device, use_amp, epoch=1,
                 accum_steps=4):
+    """Run one training epoch with gradient accumulation and NaN guarding.
+    Returns dict of averaged loss components."""
     model.train()
     epoch_losses = {}
     nan_batches = 0
@@ -143,6 +147,7 @@ def train_epoch(model, dl, optimizer, scaler_amp, cfg, y_col_names, y_weights,
 @torch.no_grad()
 def eval_epoch(model, dl, cfg, y_col_names, y_weights,
                physics_loss_fn, scaler_X, device, use_amp, epoch=1):
+    """Run one evaluation epoch without gradients. Returns dict of averaged loss components."""
     model.eval()
     epoch_losses = {}
     for X_batch, Y_batch in dl:
@@ -165,6 +170,7 @@ def eval_epoch(model, dl, cfg, y_col_names, y_weights,
 # ============================================================
 
 def parse_args():
+    """Parse command-line arguments for training configuration overrides."""
     parser = argparse.ArgumentParser()
     parser.add_argument('--data', type=str, default='data/apollo_cfd_database.csv')
     parser.add_argument('--epochs', type=int, default=None)
@@ -190,6 +196,7 @@ def parse_args():
 
 
 def main():
+    """Main training entry point: setup DDP, load data, train model, evaluate."""
     args = parse_args()
     rank, local_rank, world_size, distributed = setup_ddp()
     device = torch.device(f'cuda:{local_rank}' if torch.cuda.is_available() else 'cpu')

@@ -11,6 +11,7 @@ from dataset import get_dataloaders
 from evaluate import evaluate_model, print_results, save_evaluation_plots
 
 def main():
+    """Load a saved checkpoint and evaluate on the test set."""
     parser = argparse.ArgumentParser()
     parser.add_argument('--checkpoint', type=str, required=True)
     parser.add_argument('--data', type=str, default='data/apollo_cfd_database.csv')

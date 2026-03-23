@@ -24,6 +24,7 @@ from dataset import (load_and_clean, build_partition_dataset,
 
 
 def main():
+    """Package model weights, scalers, mesh, and config for production inference."""
     parser = argparse.ArgumentParser(description='Package trained model for inference')
     parser.add_argument('--checkpoint', type=str, required=True)
     parser.add_argument('--data', type=str, default='data/apollo_cfd_database.csv')
