@@ -6,8 +6,7 @@
 data/
 
 # Model checkpoints
-*.pth
-checkpoints/
+
 
 # Logs
 logs/
