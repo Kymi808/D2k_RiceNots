@@ -42,7 +42,7 @@ Size: ~2.2GB (9,282,560 rows × 15 columns)
 
 ```bash
 # SSH into NOTS
-ssh kzz1@nots.rice.edu
+ssh <netid>@nots.rice.edu
 
 # Navigate to project
 cd /projects/dsci435/NASA_REENTRY_SP26/D2k_RiceNots
