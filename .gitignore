@@ -36,4 +36,4 @@ Thumbs.db
 slurm-*.out
 
 # Results (keep structure, ignore large outputs)
-results/*
+
