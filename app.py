@@ -184,20 +184,34 @@ def main():
     dynamic_pressure = 0.5 * density * velocity**2
     st.sidebar.metric("Dynamic Pressure (Pa)", f"{dynamic_pressure:,.0f}")
 
-    # Output selector
+    # Output selector — these don't trigger re-inference, just re-render
     st.sidebar.header("Display")
-    selected_output = st.sidebar.radio(
+    selected_output = st.sidebar.selectbox(
         "Surface Quantity",
         surrogate.output_names,
         format_func=lambda x: OUTPUT_LABELS.get(x, x),
+        key="output_select",
     )
 
-    view_mode = st.sidebar.radio("View", ["3D Interactive", "Side View (2D)", "Both"])
-    point_size = st.sidebar.slider("Point Size", 0.5, 5.0, 1.5, step=0.5)
+    view_mode = st.sidebar.selectbox("View", ["3D Interactive", "Side View (2D)", "Both"],
+                                     key="view_select")
+    point_size = st.sidebar.slider("Point Size", 0.5, 5.0, 1.5, step=0.5, key="point_size")
 
-    # Run prediction
-    if st.sidebar.button("Predict", type="primary", use_container_width=True):
-        with st.spinner(f"Running inference ({surrogate.device})..."):
+    # Check if flight conditions changed
+    current_conditions = {
+        'velocity': velocity, 'density': density,
+        'aoa': aoa, 'dynamic_pressure': dynamic_pressure,
+    }
+    needs_rerun = (
+        'conditions' not in st.session_state
+        or st.session_state['conditions'] != current_conditions
+    )
+
+    # Run prediction — only when conditions change or first time
+    if st.sidebar.button("Predict", type="primary", use_container_width=True) or (
+        needs_rerun and 'results' not in st.session_state
+    ):
+        with st.spinner(f"Running inference ({surrogate.device})... ~3s GPU / ~60s CPU"):
             t0 = time.time()
             results = surrogate.predict(
                 velocity=velocity,
@@ -209,10 +223,7 @@ def main():
 
         st.session_state['results'] = results
         st.session_state['elapsed'] = elapsed
-        st.session_state['conditions'] = {
-            'velocity': velocity, 'density': density,
-            'aoa': aoa, 'dynamic_pressure': dynamic_pressure,
-        }
+        st.session_state['conditions'] = current_conditions
 
     # Display results
     if 'results' in st.session_state:
