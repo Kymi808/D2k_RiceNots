@@ -455,6 +455,11 @@ def main():
             print(f"Skipping {folder} \u2014 no checkpoint found")
             continue
 
+        error_maps_dir = os.path.join(RESULTS_DIR, folder, 'error_maps')
+        if os.path.exists(error_maps_dir) and len(os.listdir(error_maps_dir)) > 0:
+            print(f"Skipping {folder} \u2014 error maps already exist")
+            continue
+
         print(f"\n{'='*60}")
         print(f"  Processing: {folder}")
         print(f"{'='*60}")
