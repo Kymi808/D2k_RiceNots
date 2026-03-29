@@ -9,7 +9,7 @@ data/
 
 
 # Logs
-
+logs/
 
 # Python
 __pycache__/
