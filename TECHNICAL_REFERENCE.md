@@ -512,9 +512,10 @@ The first training runs were cut off at 24 hours (~155 epochs) by the SLURM time
 
 ### Ablation findings
 
-- **Training time is the critical variable**: Under time-limited training (24h, ~155 epochs), no-physics wins because physics models haven't recovered from the epoch-70 warmup disruption. With full convergence (300 epochs), strong physics produces the best results (99.8% qw ±5%) — a complete reversal.
-- **Strong physics provides meaningful regularization**: With sufficient epochs, 5x physics lambdas achieve the lowest val loss (0.0019) and highest accuracy across all outputs. The physics constraints act as an inductive bias that helps the model converge to a better optimum.
-- **No-physics is the safe choice under time constraints**: When training time is limited, no-physics avoids the warmup disruption and converges faster. For time-constrained scenarios (24h SLURM jobs), no-physics is recommended.
+- **Physics requires both abundant data AND sufficient time**: Strong physics (5x) achieves the best results (99.8% qw ±5%) only with 148 training solutions AND 300 epochs. This is a conjunction — remove either condition and no-physics wins.
+- **With less data, physics hurts even when fully converged**: At 60% and 40% data, no-physics outperforms both normal and strong physics despite all models reaching convergence (early stopping or 300 epochs). The physics constraints are too rigid for the model to fit limited training data effectively — the inductive bias becomes a straitjacket.
+- **With limited training time, physics hurts at any data level**: At 80% data with only ~155 epochs (24h cutoff), no-physics wins (98.5% vs 98.0-98.4%). The epoch-70 physics warmup disruption requires 100+ additional epochs to recover from.
+- **Strong physics provides meaningful regularization in the right regime**: With both sufficient data and time, 5x physics lambdas achieve the lowest val loss (0.0019) and highest accuracy across all outputs. The constraints act as an inductive bias that guides the optimizer to a better minimum.
 - **Architecture matters more than loss design**: MLP baseline (96.8%) vs Mamba (99.8%) shows a 3.0% gap from sequential modeling alone. The full pipeline (partitioning, Huber loss, gradient accumulation) contributes an additional 2.3% over the previous simple autoencoder (94.5%).
 - **QW-only vs multi-output**: QW-only gets slightly better qw accuracy (98.9% vs 98.5% at 24h) because all model capacity focuses on one target. But multi-output predicts all 5 quantities simultaneously, which is more useful.
 - **Cross-validation consistency**: Both seeds (123, 456) produce consistent results across all physics configurations, confirming the findings are not seed-dependent.

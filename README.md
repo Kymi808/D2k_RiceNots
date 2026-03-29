@@ -26,17 +26,18 @@ Fully converged strong physics model (seed 456, 300 epochs, 40h training) evalua
 | θ ±5% | 98.0% | 98.0% | **98.3%** |
 | Val loss | 0.002194 | 0.002107 | **0.001900** |
 
-With sufficient training time (300 epochs), strong physics (5x lambda) outperforms both no-physics and normal physics on every metric. Physics constraints provide meaningful inductive bias when the model has enough epochs to absorb the optimization overhead.
+With sufficient training time AND abundant data, strong physics (5x lambda) outperforms both no-physics and normal physics on every metric.
 
-### Physics Ablation — Time-Limited (seed 123, 24h commons partition, ~155 epochs)
+### Physics Ablation — All Splits (fully converged)
 
-| Split | No Physics | Normal Physics | Strong Physics (5x) | MLP Baseline |
-|-------|-----------|---------------|---------------------|-------------|
-| 80/10/10 | **98.5%** | 98.0% | 98.4% | 96.8% |
-| 60/20/20 | **96.8%** | 96.3% | 95.8% | — |
-| 40/30/30 | **92.9%** | 92.1% | 92.2% | — |
+| Split | Converged? | No Physics | Normal Physics | Strong Physics (5x) | MLP Baseline |
+|-------|-----------|-----------|---------------|---------------------|-------------|
+| 80/10/10 (seed 456, 300ep) | Yes | 99.5% | 99.5% | **99.8%** | — |
+| 80/10/10 (seed 123, ~155ep) | Cutoff | **98.5%** | 98.0% | 98.4% | 96.8% |
+| 60/20/20 (early stop) | Yes | **96.8%** | 96.3% | 95.8% | — |
+| 40/30/30 (300ep) | Yes | **92.9%** | 92.1% | 92.2% | — |
 
-Under time-limited training, no-physics wins because physics models haven't recovered from the epoch-70 warmup disruption. This reverses with sufficient training time.
+Physics constraints help when there is **both** abundant data (148 solutions) **and** sufficient training time (300 epochs). With less data (60-40%), no-physics wins even with full convergence — the constraints are too rigid for the model to fit limited data effectively.
 
 ### Comparison to Previous Approaches
 
@@ -68,7 +69,7 @@ The model trained on 50% of the data matches the accuracy of the previous pointw
 
 ### Key Findings
 
-- **Physics losses help when fully converged**: Strong physics (5x) achieves the best results (99.8% qw ±5%) when given 300 epochs. Under time-limited training (24h, ~155 epochs), no-physics wins because the model hasn't recovered from the physics warmup disruption. Training time is the key variable, not physics loss design.
+- **Physics losses require both data and time**: Strong physics (5x) achieves the best results (99.8% qw ±5%) with 148 training solutions and 300 epochs. With less data (60-40%), no-physics wins even with full convergence — physics constraints become too rigid. With limited training time (24h), no-physics wins even at 80% data because the model hasn't recovered from the physics warmup disruption.
 - **Architecture matters**: Mamba SSM (99.8%) outperforms MLP baseline (96.8%) by 3.0% — spatial context from sequential modeling captures patterns that pointwise models miss
 - **Training pipeline contributes more than architecture**: MLP baseline (96.8%) beats the previous simple autoencoder (94.5%) using the same pointwise approach — the improvement comes from overlapping partitions, Huber loss, gradient accumulation, and the full training pipeline
 - **Graceful degradation**: Reducing training data from 148 to 74 solutions costs only ~7% qw accuracy
