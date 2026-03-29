@@ -8,11 +8,11 @@ Fully converged strong physics model (seed 456, 300 epochs, 40h training) evalua
 
 | Output | Within ±1% | Within ±3% | Within ±5% | Within ±10% | Median Error | 95th %ile |
 |--------|-----------|-----------|-----------|------------|-------------|----------|
-| Heat Flux qw (W/m²) | 75.6% | 98.1% | **99.8%** | 100.0% | 0.55% | 2.2% |
-| Pressure pw (Pa) | 63.8% | 94.3% | **97.4%** | 99.5% | 0.71% | 3.4% |
-| Shear Stress τw (Pa) | 72.6% | 97.3% | **99.4%** | 99.9% | 0.58% | 2.4% |
+| Heat Flux qw (W/m²) | 75.6% | 97.8% | **99.8%** | 100.0% | 0.55% | 2.2% |
+| Pressure pw (Pa) | 63.8% | 93.8% | **97.4%** | 99.5% | 0.71% | 3.4% |
+| Shear Stress τw (Pa) | 72.6% | 96.9% | **99.4%** | 99.9% | 0.58% | 2.4% |
 | Edge Mach Me (-) | 87.8% | 99.5% | **99.9%** | 100.0% | 0.34% | 1.5% |
-| Momentum Thickness θ (m) | 59.1% | 94.5% | **98.3%** | 99.5% | 0.80% | 3.2% |
+| Momentum Thickness θ (m) | 59.1% | 94.1% | **98.3%** | 99.5% | 0.80% | 3.2% |
 
 ### Physics Ablation — Fully Converged (seed 456, 300 epochs, long partition)
 
