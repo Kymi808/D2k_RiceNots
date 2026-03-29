@@ -1,0 +1,61 @@
+no_physics: True
+qw_only: False
+block_type: mamba3
+seq_len: 8192
+n_partitions: 8
+d_model: 64
+d_state: 64
+n_layers: 4
+latent_dim: 16
+targets: ['qw', 'pw', 'tw', 'me', 'theta']
+target_weights: {'qw': 3.0, 'pw': 1.0, 'tw': 1.0, 'me': 1.0, 'theta': 1.0}
+batch_size: 4
+epochs_run: 300
+best_val_loss: 0.002194
+training_time_min: 2375.3
+world_size: 4
+
+qw:
+  MAE: 5,860
+  RMSE: 10,734
+  pct_1: 70.3%
+  pct_5: 99.5%
+  pct_10: 100.0%
+  median_err: 0.62%
+  q95_err: 2.6%
+
+pw:
+  MAE: 126
+  RMSE: 230
+  pct_1: 55.6%
+  pct_5: 96.4%
+  pct_10: 99.3%
+  median_err: 0.86%
+  q95_err: 4.3%
+
+tw:
+  MAE: 1
+  RMSE: 1
+  pct_1: 65.1%
+  pct_5: 98.9%
+  pct_10: 99.9%
+  median_err: 0.69%
+  q95_err: 3.0%
+
+me:
+  MAE: 0
+  RMSE: 0
+  pct_1: 86.1%
+  pct_5: 99.8%
+  pct_10: 100.0%
+  median_err: 0.40%
+  q95_err: 1.5%
+
+theta:
+  MAE: 0
+  RMSE: 0
+  pct_1: 55.5%
+  pct_5: 98.0%
+  pct_10: 99.5%
+  median_err: 0.87%
+  q95_err: 3.4%

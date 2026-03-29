@@ -1,0 +1,77 @@
+============================================
+Job ID: 7916175  [ERROR MAPS]
+Date:   Sat Mar 28 08:56:13 PM CDT 2026
+============================================
+Device: cuda
+Skipping full_model — error maps already exist
+Skipping no_physics — error maps already exist
+Skipping qw_only — error maps already exist
+Skipping full_model_long — error maps already exist
+Skipping full_70_15 — error maps already exist
+Skipping full_60_20 — error maps already exist
+Skipping full_50_25 — error maps already exist
+Skipping full_40_30 — error maps already exist
+Skipping mlp_baseline — error maps already exist
+Skipping no_physics_60 — error maps already exist
+Skipping no_physics_40 — error maps already exist
+Skipping strong_physics_80 — error maps already exist
+Skipping strong_physics_60 — error maps already exist
+Skipping strong_physics_40 — error maps already exist
+
+============================================================
+  Processing: strong_physics_80_seed2
+============================================================
+  Loading data (seed=456, train=0.8)...
+Raw dataset shape: (9282560, 15)
+Detected solutions: 185
+Split counts:
+split
+train    7426048
+test      953344
+val       903168
+Name: count, dtype: int64
+After cleaning: 9,106,059 rows, 185 solutions
+  Loading model from organized_results/strong_physics_80_seed2/best_model.pt...
+  Running inference on 152 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/strong_physics_80_seed2/error_maps/error_map_qw.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/error_map_pw.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/error_map_tw.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/error_map_me.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/error_map_theta.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/error_map_overview.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/truth_vs_pred_qw.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/truth_vs_pred_pw.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/truth_vs_pred_tw.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/truth_vs_pred_me.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/truth_vs_pred_theta.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/truth_vs_pred_overview.png
+    Saved organized_results/strong_physics_80_seed2/error_maps/error_distribution.png
+
+============================================================
+  Processing: no_physics_long
+============================================================
+  Loading model from organized_results/no_physics_long/best_model.pt...
+  Running inference on 152 test partitions...
+  Reconstructing solutions and computing errors...
+  Generating error maps...
+    Saved organized_results/no_physics_long/error_maps/error_map_qw.png
+    Saved organized_results/no_physics_long/error_maps/error_map_pw.png
+    Saved organized_results/no_physics_long/error_maps/error_map_tw.png
+    Saved organized_results/no_physics_long/error_maps/error_map_me.png
+    Saved organized_results/no_physics_long/error_maps/error_map_theta.png
+    Saved organized_results/no_physics_long/error_maps/error_map_overview.png
+    Saved organized_results/no_physics_long/error_maps/truth_vs_pred_qw.png
+    Saved organized_results/no_physics_long/error_maps/truth_vs_pred_pw.png
+    Saved organized_results/no_physics_long/error_maps/truth_vs_pred_tw.png
+    Saved organized_results/no_physics_long/error_maps/truth_vs_pred_me.png
+    Saved organized_results/no_physics_long/error_maps/truth_vs_pred_theta.png
+    Saved organized_results/no_physics_long/error_maps/truth_vs_pred_overview.png
+    Saved organized_results/no_physics_long/error_maps/error_distribution.png
+
+============================================================
+  All error maps generated!
+============================================================
+
+Error maps completed: Sat Mar 28 09:00:02 PM CDT 2026
