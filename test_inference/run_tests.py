@@ -7,6 +7,7 @@ Usage:
 
 All results saved to test_inference/results/
 """
+import argparse
 import os
 import sys
 import time
@@ -22,8 +23,12 @@ import matplotlib.pyplot as plt
 
 from inference import MambaSurrogate
 
-RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results')
-MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'packaged_model')
+TEST_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DEFAULT_RESULTS_DIR = os.path.join(TEST_DIR, 'results')
+DEFAULT_MODEL_DIR = os.path.join(PROJECT_ROOT, 'packaged_model')
+RESULTS_DIR = DEFAULT_RESULTS_DIR
+MODEL_DIR = DEFAULT_MODEL_DIR
 
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
@@ -454,9 +459,23 @@ def generate_visualizations(surrogate):
 
 
 def main():
+    global MODEL_DIR, RESULTS_DIR
+    parser = argparse.ArgumentParser(description='Run inference tests for a packaged model')
+    parser.add_argument('--model_dir', type=str, default=DEFAULT_MODEL_DIR,
+                        help='Path to packaged model directory')
+    parser.add_argument('--results_dir', type=str, default=DEFAULT_RESULTS_DIR,
+                        help='Directory to save test outputs')
+    args = parser.parse_args()
+
+    MODEL_DIR = os.path.abspath(args.model_dir)
+    RESULTS_DIR = os.path.abspath(args.results_dir)
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+
     print("=" * 60)
     print("  MAMBA CFD SURROGATE — INFERENCE TEST SUITE")
     print("=" * 60)
+    print(f"  Model dir: {MODEL_DIR}")
+    print(f"  Results dir: {RESULTS_DIR}")
 
     # Test 1: Loading
     surrogate = test_model_loading()
