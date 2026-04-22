@@ -23,6 +23,14 @@ from dataset import (load_and_clean, build_partition_dataset,
                      fit_scalers, spatial_sort_solution)
 
 
+def parse_head_dims(spec):
+    """Parse a comma-separated list of hidden dims for prediction heads."""
+    dims = [int(part.strip()) for part in spec.split(',') if part.strip()]
+    if not dims or any(dim <= 0 for dim in dims):
+        raise ValueError(f"Invalid prediction head dims: {spec!r}")
+    return dims
+
+
 def main():
     """Package model weights, scalers, mesh, and config for production inference."""
     parser = argparse.ArgumentParser(description='Package trained model for inference')
@@ -32,6 +40,11 @@ def main():
     parser.add_argument('--split_seed', type=int, default=None)
     parser.add_argument('--train_frac', type=float, default=None)
     parser.add_argument('--val_frac', type=float, default=None)
+    parser.add_argument('--pred_head_dims', type=str, default=None)
+    parser.add_argument('--pred_head_dropout', type=float, default=None)
+    parser.add_argument('--use_residual_ffn', action='store_true')
+    parser.add_argument('--ffn_hidden_dim', type=int, default=None)
+    parser.add_argument('--ffn_dropout', type=float, default=None)
     parser.add_argument('--qw_only', action='store_true')
     args = parser.parse_args()
 
@@ -45,6 +58,16 @@ def main():
         cfg.train_frac = args.train_frac
     if args.val_frac is not None:
         cfg.val_frac = args.val_frac
+    if args.pred_head_dims is not None:
+        cfg.pred_head_hidden_dims = parse_head_dims(args.pred_head_dims)
+    if args.pred_head_dropout is not None:
+        cfg.pred_head_dropout = args.pred_head_dropout
+    if args.use_residual_ffn:
+        cfg.use_residual_ffn = True
+    if args.ffn_hidden_dim is not None:
+        cfg.ffn_hidden_dim = args.ffn_hidden_dim
+    if args.ffn_dropout is not None:
+        cfg.ffn_dropout = args.ffn_dropout
     if args.qw_only:
         cfg.predict_pw = False
         cfg.predict_tw = False
@@ -88,6 +111,11 @@ def main():
         'n_layers': cfg.n_layers,
         'latent_dim': cfg.latent_dim,
         'expand': cfg.expand,
+        'pred_head_hidden_dims': cfg.pred_head_hidden_dims,
+        'pred_head_dropout': cfg.pred_head_dropout,
+        'use_residual_ffn': cfg.use_residual_ffn,
+        'ffn_hidden_dim': cfg.ffn_hidden_dim,
+        'ffn_dropout': cfg.ffn_dropout,
         'block_type': cfg.block_type,
         'use_rope': cfg.use_rope,
         'use_trapezoidal': cfg.use_trapezoidal,

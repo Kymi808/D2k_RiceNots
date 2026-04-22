@@ -26,6 +26,11 @@ class Config:
     expand: int = 2
     use_rope: bool = True
     use_trapezoidal: bool = True
+    pred_head_hidden_dims: List[int] = field(default_factory=lambda: [64])
+    pred_head_dropout: float = 0.0
+    use_residual_ffn: bool = False
+    ffn_hidden_dim: int = 128
+    ffn_dropout: float = 0.0
 
     # --- Input features ---
     x_cols: List[str] = field(default_factory=lambda: [

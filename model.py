@@ -153,16 +153,36 @@ class SelectiveSSM(nn.Module):
 
 class MambaBlock(nn.Module):
     """Pre-norm Mamba block with residual connection."""
-    def __init__(self, d_model, d_state, d_conv, expand, use_rope, use_trapezoidal):
+    def __init__(self, d_model, d_state, d_conv, expand, use_rope, use_trapezoidal,
+                 use_residual_ffn=False, ffn_hidden_dim=128, ffn_dropout=0.0):
         super().__init__()
         self.norm = nn.LayerNorm(d_model)
         self.ssm = SelectiveSSM(
             d_model=d_model, d_state=d_state, d_conv=d_conv,
             expand=expand, use_rope=use_rope, use_trapezoidal=use_trapezoidal
         )
+        if ffn_hidden_dim <= 0:
+            raise ValueError(f"FFN hidden dim must be positive, got {ffn_hidden_dim}")
+        if not 0.0 <= ffn_dropout < 1.0:
+            raise ValueError(f"FFN dropout must be in [0, 1), got {ffn_dropout}")
+        self.ffn_norm = nn.LayerNorm(d_model) if use_residual_ffn else None
+        if use_residual_ffn:
+            ffn_layers = [
+                nn.Linear(d_model, ffn_hidden_dim),
+                nn.SiLU(),
+            ]
+            if ffn_dropout > 0.0:
+                ffn_layers.append(nn.Dropout(ffn_dropout))
+            ffn_layers.append(nn.Linear(ffn_hidden_dim, d_model))
+            self.ffn = nn.Sequential(*ffn_layers)
+        else:
+            self.ffn = None
 
     def forward(self, x):
-        return x + self.ssm(self.norm(x))
+        x = x + self.ssm(self.norm(x))
+        if self.ffn is not None:
+            x = x + self.ffn(self.ffn_norm(x))
+        return x
 
 
 class MLPBlock(nn.Module):
@@ -182,14 +202,37 @@ class MLPBlock(nn.Module):
 
 class PredictionHead(nn.Module):
     """Per-output prediction head from latent features."""
-    def __init__(self, d_in, d_hidden=64, n_outputs=1):
+    def __init__(self, d_in, hidden_dims=None, dropout=0.0, n_outputs=1):
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(d_in, d_hidden),
-            nn.SiLU(),
-            nn.LayerNorm(d_hidden),
-            nn.Linear(d_hidden, n_outputs)
-        )
+        hidden_dims = list(hidden_dims or [64])
+        if any(dim <= 0 for dim in hidden_dims):
+            raise ValueError(f"Prediction head dims must be positive, got {hidden_dims}")
+        if not 0.0 <= dropout < 1.0:
+            raise ValueError(f"Prediction head dropout must be in [0, 1), got {dropout}")
+
+        # Preserve the exact legacy layout so existing checkpoints still load.
+        if hidden_dims == [64] and dropout == 0.0:
+            self.net = nn.Sequential(
+                nn.Linear(d_in, 64),
+                nn.SiLU(),
+                nn.LayerNorm(64),
+                nn.Linear(64, n_outputs)
+            )
+            return
+
+        layers = []
+        prev_dim = d_in
+        for hidden_dim in hidden_dims:
+            layers.extend([
+                nn.Linear(prev_dim, hidden_dim),
+                nn.SiLU(),
+                nn.LayerNorm(hidden_dim),
+            ])
+            if dropout > 0.0:
+                layers.append(nn.Dropout(dropout))
+            prev_dim = hidden_dim
+        layers.append(nn.Linear(prev_dim, n_outputs))
+        self.net = nn.Sequential(*layers)
 
     def forward(self, x):
         return self.net(x)
@@ -223,7 +266,10 @@ class MambaAutoencoder(nn.Module):
                 MambaBlock(
                     d_model=d, d_state=config.d_state,
                     d_conv=config.d_conv, expand=config.expand,
-                    use_rope=use_rope, use_trapezoidal=use_trap
+                    use_rope=use_rope, use_trapezoidal=use_trap,
+                    use_residual_ffn=config.use_residual_ffn,
+                    ffn_hidden_dim=config.ffn_hidden_dim,
+                    ffn_dropout=config.ffn_dropout,
                 ) for _ in range(config.n_layers)
             ])
         elif config.block_type == 'mlp':
@@ -249,7 +295,10 @@ class MambaAutoencoder(nn.Module):
         self.pred_heads = nn.ModuleDict()
         for name, _, _ in config.target_config:
             self.pred_heads[name] = PredictionHead(
-                config.d_model, d_hidden=64, n_outputs=1
+                config.d_model,
+                hidden_dims=config.pred_head_hidden_dims,
+                dropout=config.pred_head_dropout,
+                n_outputs=1,
             )
 
     def forward(self, x):

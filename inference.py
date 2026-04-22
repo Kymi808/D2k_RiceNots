@@ -59,7 +59,9 @@ class MambaSurrogate:
         # Build model config
         self.cfg = Config()
         for key in ['d_model', 'd_state', 'd_conv', 'n_layers', 'latent_dim',
-                     'expand', 'block_type', 'use_rope', 'use_trapezoidal',
+                     'expand', 'pred_head_hidden_dims', 'pred_head_dropout',
+                     'use_residual_ffn', 'ffn_hidden_dim', 'ffn_dropout',
+                     'block_type', 'use_rope', 'use_trapezoidal',
                      'seq_len', 'partition_stride', 'points_per_solution']:
             if key in self.config_dict:
                 setattr(self.cfg, key, self.config_dict[key])

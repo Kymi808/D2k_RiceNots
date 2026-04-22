@@ -10,6 +10,14 @@ from model import MambaAutoencoder
 from dataset import get_dataloaders
 from evaluate import evaluate_model, print_results, save_evaluation_plots
 
+
+def parse_head_dims(spec):
+    """Parse a comma-separated list of hidden dims for prediction heads."""
+    dims = [int(part.strip()) for part in spec.split(',') if part.strip()]
+    if not dims or any(dim <= 0 for dim in dims):
+        raise ValueError(f"Invalid prediction head dims: {spec!r}")
+    return dims
+
 def main():
     """Load a saved checkpoint and evaluate on the test set."""
     parser = argparse.ArgumentParser()
@@ -17,6 +25,11 @@ def main():
     parser.add_argument('--data', type=str, default='data/apollo_cfd_database.csv')
     parser.add_argument('--save_dir', type=str, default=None)
     parser.add_argument('--block_type', type=str, default=None)
+    parser.add_argument('--pred_head_dims', type=str, default=None)
+    parser.add_argument('--pred_head_dropout', type=float, default=None)
+    parser.add_argument('--use_residual_ffn', action='store_true')
+    parser.add_argument('--ffn_hidden_dim', type=int, default=None)
+    parser.add_argument('--ffn_dropout', type=float, default=None)
     parser.add_argument('--no_physics', action='store_true')
     parser.add_argument('--qw_only', action='store_true')
     parser.add_argument('--train_frac', type=float, default=None)
@@ -31,6 +44,16 @@ def main():
     cfg = Config()
     if args.block_type is not None:
         cfg.block_type = args.block_type
+    if args.pred_head_dims is not None:
+        cfg.pred_head_hidden_dims = parse_head_dims(args.pred_head_dims)
+    if args.pred_head_dropout is not None:
+        cfg.pred_head_dropout = args.pred_head_dropout
+    if args.use_residual_ffn:
+        cfg.use_residual_ffn = True
+    if args.ffn_hidden_dim is not None:
+        cfg.ffn_hidden_dim = args.ffn_hidden_dim
+    if args.ffn_dropout is not None:
+        cfg.ffn_dropout = args.ffn_dropout
     if args.train_frac is not None:
         cfg.train_frac = args.train_frac
     if args.val_frac is not None:
@@ -65,6 +88,8 @@ def main():
     n_params = sum(p.numel() for p in model.parameters())
     print(f"Loaded checkpoint: {args.checkpoint}")
     print(f"Model: {n_params:,} parameters, block_type={cfg.block_type}")
+    print(f"Prediction head dims: {cfg.pred_head_hidden_dims}, dropout={cfg.pred_head_dropout}")
+    print(f"Residual FFN: {cfg.use_residual_ffn}, hidden_dim={cfg.ffn_hidden_dim}, dropout={cfg.ffn_dropout}")
     print(f"Targets: {y_col_names}")
 
     # Evaluate

@@ -181,6 +181,16 @@ def parse_args():
     parser.add_argument('--d_state', type=int, default=None)
     parser.add_argument('--n_layers', type=int, default=None)
     parser.add_argument('--latent_dim', type=int, default=None)
+    parser.add_argument('--pred_head_dims', type=str, default=None,
+                        help='Comma-separated prediction head dims, e.g. 128,64')
+    parser.add_argument('--pred_head_dropout', type=float, default=None,
+                        help='Dropout probability inside prediction heads')
+    parser.add_argument('--use_residual_ffn', action='store_true',
+                        help='Add a residual FFN after each Mamba block')
+    parser.add_argument('--ffn_hidden_dim', type=int, default=None,
+                        help='Hidden dimension for the optional residual FFN')
+    parser.add_argument('--ffn_dropout', type=float, default=None,
+                        help='Dropout probability inside the optional residual FFN')
     parser.add_argument('--block_type', type=str, default=None)
     parser.add_argument('--no_compile', action='store_true')
     parser.add_argument('--no_physics', action='store_true', help='Disable all physics losses')
@@ -193,6 +203,14 @@ def parse_args():
     parser.add_argument('--save_dir', type=str, default='results')
     parser.add_argument('--checkpoint_dir', type=str, default='checkpoints')
     return parser.parse_args()
+
+
+def parse_head_dims(spec):
+    """Parse a comma-separated list of hidden dims for prediction heads."""
+    dims = [int(part.strip()) for part in spec.split(',') if part.strip()]
+    if not dims or any(dim <= 0 for dim in dims):
+        raise ValueError(f"Invalid prediction head dims: {spec!r}")
+    return dims
 
 
 def main():
@@ -226,6 +244,16 @@ def main():
         cfg.n_layers = args.n_layers
     if args.latent_dim is not None:
         cfg.latent_dim = args.latent_dim
+    if args.pred_head_dims is not None:
+        cfg.pred_head_hidden_dims = parse_head_dims(args.pred_head_dims)
+    if args.pred_head_dropout is not None:
+        cfg.pred_head_dropout = args.pred_head_dropout
+    if args.use_residual_ffn:
+        cfg.use_residual_ffn = True
+    if args.ffn_hidden_dim is not None:
+        cfg.ffn_hidden_dim = args.ffn_hidden_dim
+    if args.ffn_dropout is not None:
+        cfg.ffn_dropout = args.ffn_dropout
     if args.block_type is not None:
         cfg.block_type = args.block_type
 
@@ -272,6 +300,8 @@ def main():
         print(f"  Block type: {cfg.block_type}")
         print(f"  seq_len: {cfg.seq_len}, partitions: {cfg.n_partitions}")
         print(f"  d_model: {cfg.d_model}, d_state: {cfg.d_state}, n_layers: {cfg.n_layers}")
+        print(f"  Prediction head dims: {cfg.pred_head_hidden_dims}, dropout: {cfg.pred_head_dropout}")
+        print(f"  Residual FFN: {cfg.use_residual_ffn}, hidden_dim: {cfg.ffn_hidden_dim}, dropout: {cfg.ffn_dropout}")
         print(f"  Targets: {cfg.y_col_names}")
         print(f"  Target weights: {dict(zip(cfg.y_col_names, cfg.y_weights))}")
         print(f"  Batch size: {cfg.batch_size} (per GPU: {cfg.batch_per_gpu})")
@@ -459,6 +489,11 @@ def main():
             f.write(f"d_state: {cfg.d_state}\n")
             f.write(f"n_layers: {cfg.n_layers}\n")
             f.write(f"latent_dim: {cfg.latent_dim}\n")
+            f.write(f"pred_head_hidden_dims: {cfg.pred_head_hidden_dims}\n")
+            f.write(f"pred_head_dropout: {cfg.pred_head_dropout}\n")
+            f.write(f"use_residual_ffn: {cfg.use_residual_ffn}\n")
+            f.write(f"ffn_hidden_dim: {cfg.ffn_hidden_dim}\n")
+            f.write(f"ffn_dropout: {cfg.ffn_dropout}\n")
             f.write(f"targets: {y_col_names}\n")
             f.write(f"target_weights: {dict(zip(y_col_names, y_weights))}\n")
             f.write(f"batch_size: {cfg.batch_size}\n")
