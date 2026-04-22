@@ -3,13 +3,13 @@
 # SLURM job: Deep heads + residual FFN with 80/10/10 split
 # ============================================================
 #SBATCH --job-name=dhffn-80-10
-#SBATCH --partition=commons
+#SBATCH --partition=long
 #SBATCH --nodes=1
 #SBATCH --ntasks=4
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=192G
 #SBATCH --gres=gpu:lovelace:4
-#SBATCH --time=24:00:00
+#SBATCH --time=72:00:00
 #SBATCH --output=logs/deep_head_ffn_80_10_%j.out
 #SBATCH --error=logs/deep_head_ffn_80_10_%j.err
 #SBATCH --mail-type=END,FAIL
