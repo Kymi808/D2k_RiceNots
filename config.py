@@ -31,6 +31,7 @@ class Config:
     use_residual_ffn: bool = False
     ffn_hidden_dim: int = 128
     ffn_dropout: float = 0.0
+    normalize_qw_by_rhov3: bool = False
 
     # --- Input features ---
     x_cols: List[str] = field(default_factory=lambda: [

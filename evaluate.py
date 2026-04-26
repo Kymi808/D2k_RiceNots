@@ -21,8 +21,23 @@ OUTPUT_LABELS = {
 }
 
 
+def _add_qw_physics_log_if_needed(pred_log, X_std_all, scaler_X, y_col_names, name, cfg):
+    """Convert normalized qw log predictions back to log10(qw) when requested."""
+    if not getattr(cfg, 'normalize_qw_by_rhov3', False) or name != 'qw':
+        return pred_log
+
+    X_phys = scaler_X.inverse_transform(
+        X_std_all.reshape(-1, cfg.n_features)
+    ).reshape(X_std_all.shape)
+    velocity = X_phys[:, :, 3:4]
+    density = X_phys[:, :, 4:5]
+    phys_log = np.log10(np.clip(density * np.power(velocity, 3), 1e-12, None))
+    return pred_log + phys_log
+
+
 @torch.no_grad()
-def evaluate_model(model, dl, scaler_y, y_col_names, Y_raw, meta, device):
+def evaluate_model(model, dl, scaler_y, y_col_names, Y_raw, meta, device,
+                   scaler_X=None, cfg=None):
     """
     Evaluate model with overlap averaging across partitions.
     Predictions from overlapping partitions are averaged per physical point,
@@ -34,9 +49,11 @@ def evaluate_model(model, dl, scaler_y, y_col_names, Y_raw, meta, device):
     """
     model.eval()
     all_preds = {name: [] for name in y_col_names}
+    all_inputs = []
 
     for X_batch, Y_batch in dl:
         X_batch = X_batch.to(device)
+        all_inputs.append(X_batch.cpu().numpy())
         with torch.amp.autocast('cuda', enabled=(device.type == 'cuda')):
             out = model(X_batch)
         for name in y_col_names:
@@ -46,12 +63,17 @@ def evaluate_model(model, dl, scaler_y, y_col_names, Y_raw, meta, device):
     # (n_partitions, seq_len, 1) per output
     for name in y_col_names:
         all_preds[name] = np.concatenate(all_preds[name], axis=0)
+    X_std_all = np.concatenate(all_inputs, axis=0)
 
     # Inverse transform predictions to physical units
     pred_phys_all = {}
     for i, name in enumerate(y_col_names):
         pred_std = all_preds[name]
         pred_log = pred_std * scaler_y.scale_[i] + scaler_y.mean_[i]
+        if cfg is not None and scaler_X is not None:
+            pred_log = _add_qw_physics_log_if_needed(
+                pred_log, X_std_all, scaler_X, y_col_names, name, cfg
+            )
         pred_phys_all[name] = np.power(10.0, pred_log)
 
     # Group partitions by solution

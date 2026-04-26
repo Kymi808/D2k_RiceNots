@@ -150,24 +150,46 @@ def build_solution_dataset(df, split_name, cfg: Config):
 
 
 def fit_scalers(X_train, Y_train, cfg: Config):
-    """Fit StandardScalers on training data. Y is log10-transformed first."""
+    """Fit StandardScalers on training data. Targets are log-transformed first."""
     scaler_X = StandardScaler()
     X_flat = X_train.reshape(-1, cfg.n_features)
     scaler_X.fit(X_flat)
 
     scaler_y = StandardScaler()
-    Y_log = np.log10(np.clip(Y_train, 1e-6, None)).astype(np.float32)
+    Y_log = transform_targets_for_training(X_train, Y_train, cfg)
     Y_flat = Y_log.reshape(-1, cfg.n_outputs)
     scaler_y.fit(Y_flat)
 
     return scaler_X, scaler_y
 
 
+def transform_targets_for_training(X, Y, cfg: Config):
+    """
+    Convert physical targets to the log-space quantities optimized by the model.
+
+    By default every target is log10(y). When normalize_qw_by_rhov3 is enabled,
+    the qw target becomes log10(qw / (rho * V^3)), matching the pointwise
+    physics-normalized heat-flux experiment.
+    """
+    Y_log = np.log10(np.clip(Y, 1e-6, None)).astype(np.float32)
+
+    if cfg.normalize_qw_by_rhov3 and 'qw' in cfg.y_col_names:
+        qw_idx = cfg.y_col_names.index('qw')
+        velocity = X[:, :, 3]
+        density = X[:, :, 4]
+        phys_log = np.log10(
+            np.clip(density * np.power(velocity, 3), 1e-12, None)
+        ).astype(np.float32)
+        Y_log[:, :, qw_idx] = Y_log[:, :, qw_idx] - phys_log
+
+    return Y_log
+
+
 def apply_scalers(X, Y, scaler_X, scaler_y, cfg: Config):
     """Apply fitted scalers. Returns scaled arrays."""
     n, sl = X.shape[0], X.shape[1]
     X_s = scaler_X.transform(X.reshape(-1, cfg.n_features)).reshape(n, sl, cfg.n_features).astype(np.float32)
-    Y_log = np.log10(np.clip(Y, 1e-6, None)).astype(np.float32)
+    Y_log = transform_targets_for_training(X, Y, cfg)
     Y_s = scaler_y.transform(Y_log.reshape(-1, cfg.n_outputs)).reshape(n, sl, cfg.n_outputs).astype(np.float32)
     return X_s, Y_s
 

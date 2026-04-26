@@ -78,14 +78,27 @@ def compute_loss(out, X_batch, Y_batch, cfg, y_col_names, y_weights,
             total_data_loss = total_data_loss + weighted
             preds_dict[name] = pred
 
-    recon_loss = F.mse_loss(out['recon'], X_batch)
+    if cfg.lambda_recon > 0:
+        recon_loss = F.mse_loss(out['recon'], X_batch)
+    else:
+        recon_loss = torch.tensor(0.0, device=X_batch.device)
     loss_dict['recon'] = recon_loss.item()
 
-    # Physics losses (with warmup)
-    phys_raw = physics_loss_fn(preds_dict, X_batch, scaler_X)
-    phys_total, phys_weighted = compute_physics_loss(phys_raw, cfg, epoch=epoch)
-    for k, v in phys_weighted.items():
-        loss_dict[f'phys_{k}'] = v
+    physics_enabled = any([
+        cfg.lambda_reynolds,
+        cfg.lambda_newtonian,
+        cfg.lambda_fay_riddell,
+        cfg.lambda_cf_bounds,
+        cfg.lambda_bl_consistency,
+        cfg.lambda_positivity,
+    ])
+    if physics_enabled:
+        phys_raw = physics_loss_fn(preds_dict, X_batch, scaler_X)
+        phys_total, phys_weighted = compute_physics_loss(phys_raw, cfg, epoch=epoch)
+        for k, v in phys_weighted.items():
+            loss_dict[f'phys_{k}'] = v
+    else:
+        phys_total = torch.tensor(0.0, device=X_batch.device)
 
     total = total_data_loss + cfg.lambda_recon * recon_loss + phys_total
     loss_dict['total'] = total.item()
@@ -191,9 +204,15 @@ def parse_args():
                         help='Hidden dimension for the optional residual FFN')
     parser.add_argument('--ffn_dropout', type=float, default=None,
                         help='Dropout probability inside the optional residual FFN')
+    parser.add_argument('--normalize_qw_by_rhov3', action='store_true',
+                        help='Train qw as log10(qw / (rho * V^3)) and report physical qw')
     parser.add_argument('--block_type', type=str, default=None)
     parser.add_argument('--no_compile', action='store_true')
     parser.add_argument('--no_physics', action='store_true', help='Disable all physics losses')
+    parser.add_argument('--no_reconstruction', action='store_true',
+                        help='Disable reconstruction loss by setting lambda_recon=0')
+    parser.add_argument('--lambda_recon', type=float, default=None,
+                        help='Override reconstruction loss weight')
     parser.add_argument('--qw_only', action='store_true', help='Only predict qw (disable other heads)')
     parser.add_argument('--w_qw', type=float, default=None, help='Override qw loss weight')
     parser.add_argument('--physics_scale', type=float, default=None, help='Multiply all physics lambdas by this factor')
@@ -254,6 +273,8 @@ def main():
         cfg.ffn_hidden_dim = args.ffn_hidden_dim
     if args.ffn_dropout is not None:
         cfg.ffn_dropout = args.ffn_dropout
+    if args.normalize_qw_by_rhov3:
+        cfg.normalize_qw_by_rhov3 = True
     if args.block_type is not None:
         cfg.block_type = args.block_type
 
@@ -268,6 +289,10 @@ def main():
     # Experiment flags
     if args.w_qw is not None:
         cfg.w_qw = args.w_qw
+    if args.lambda_recon is not None:
+        cfg.lambda_recon = args.lambda_recon
+    if args.no_reconstruction:
+        cfg.lambda_recon = 0.0
     if args.qw_only:
         cfg.predict_pw = False
         cfg.predict_tw = False
@@ -302,8 +327,10 @@ def main():
         print(f"  d_model: {cfg.d_model}, d_state: {cfg.d_state}, n_layers: {cfg.n_layers}")
         print(f"  Prediction head dims: {cfg.pred_head_hidden_dims}, dropout: {cfg.pred_head_dropout}")
         print(f"  Residual FFN: {cfg.use_residual_ffn}, hidden_dim: {cfg.ffn_hidden_dim}, dropout: {cfg.ffn_dropout}")
+        print(f"  Normalize qw by rho*V^3: {cfg.normalize_qw_by_rhov3}")
         print(f"  Targets: {cfg.y_col_names}")
         print(f"  Target weights: {dict(zip(cfg.y_col_names, cfg.y_weights))}")
+        print(f"  Reconstruction weight: {cfg.lambda_recon}")
         print(f"  Batch size: {cfg.batch_size} (per GPU: {cfg.batch_per_gpu})")
         print(f"  Epochs: {cfg.epochs}, LR: {cfg.lr}")
         print()
@@ -470,7 +497,7 @@ def main():
         # Use non-distributed test loader so we evaluate on ALL test data
         test_results = evaluate_model(
             eval_model, test_dl_eval, scaler_y, y_col_names, Y_test_raw_eval,
-            meta_test_eval, device
+            meta_test_eval, device, scaler_X=scaler_X, cfg=cfg
         )
         print_results(test_results, y_col_names, cfg.block_type)
 
@@ -494,8 +521,10 @@ def main():
             f.write(f"use_residual_ffn: {cfg.use_residual_ffn}\n")
             f.write(f"ffn_hidden_dim: {cfg.ffn_hidden_dim}\n")
             f.write(f"ffn_dropout: {cfg.ffn_dropout}\n")
+            f.write(f"normalize_qw_by_rhov3: {cfg.normalize_qw_by_rhov3}\n")
             f.write(f"targets: {y_col_names}\n")
             f.write(f"target_weights: {dict(zip(y_col_names, y_weights))}\n")
+            f.write(f"lambda_recon: {cfg.lambda_recon}\n")
             f.write(f"batch_size: {cfg.batch_size}\n")
             f.write(f"epochs_run: {epoch}\n")
             f.write(f"best_val_loss: {best_val_loss:.6f}\n")

@@ -30,7 +30,11 @@ def main():
     parser.add_argument('--use_residual_ffn', action='store_true')
     parser.add_argument('--ffn_hidden_dim', type=int, default=None)
     parser.add_argument('--ffn_dropout', type=float, default=None)
+    parser.add_argument('--normalize_qw_by_rhov3', action='store_true')
     parser.add_argument('--no_physics', action='store_true')
+    parser.add_argument('--no_reconstruction', action='store_true')
+    parser.add_argument('--lambda_recon', type=float, default=None)
+    parser.add_argument('--w_qw', type=float, default=None)
     parser.add_argument('--qw_only', action='store_true')
     parser.add_argument('--train_frac', type=float, default=None)
     parser.add_argument('--val_frac', type=float, default=None)
@@ -54,6 +58,14 @@ def main():
         cfg.ffn_hidden_dim = args.ffn_hidden_dim
     if args.ffn_dropout is not None:
         cfg.ffn_dropout = args.ffn_dropout
+    if args.normalize_qw_by_rhov3:
+        cfg.normalize_qw_by_rhov3 = True
+    if args.w_qw is not None:
+        cfg.w_qw = args.w_qw
+    if args.lambda_recon is not None:
+        cfg.lambda_recon = args.lambda_recon
+    if args.no_reconstruction:
+        cfg.lambda_recon = 0.0
     if args.train_frac is not None:
         cfg.train_frac = args.train_frac
     if args.val_frac is not None:
@@ -90,6 +102,9 @@ def main():
     print(f"Model: {n_params:,} parameters, block_type={cfg.block_type}")
     print(f"Prediction head dims: {cfg.pred_head_hidden_dims}, dropout={cfg.pred_head_dropout}")
     print(f"Residual FFN: {cfg.use_residual_ffn}, hidden_dim={cfg.ffn_hidden_dim}, dropout={cfg.ffn_dropout}")
+    print(f"Normalize qw by rho*V^3: {cfg.normalize_qw_by_rhov3}")
+    print(f"Reconstruction weight: {cfg.lambda_recon}")
+    print(f"Target weights: {dict(zip(y_col_names, cfg.y_weights))}")
     print(f"Targets: {y_col_names}")
 
     # Evaluate
@@ -99,7 +114,7 @@ def main():
 
     test_results = evaluate_model(
         model, test_dl, scaler_y, y_col_names, Y_test_raw,
-        meta_test, device
+        meta_test, device, scaler_X=scaler_X, cfg=cfg
     )
     print_results(test_results, y_col_names, cfg.block_type)
     save_evaluation_plots(test_results, y_col_names, args.save_dir)
