@@ -206,6 +206,16 @@ def parse_args():
                         help='Dropout probability inside the optional residual FFN')
     parser.add_argument('--normalize_qw_by_rhov3', action='store_true',
                         help='Train qw as log10(qw / (rho * V^3)) and report physical qw')
+    parser.add_argument('--n_heads', type=int, default=None,
+                        help='Number of attention heads for transformer block types')
+    parser.add_argument('--transformer_ffn_dim', type=int, default=None,
+                        help='Feed-forward hidden dimension for transformer block types')
+    parser.add_argument('--attention_dropout', type=float, default=None,
+                        help='Attention dropout for transformer block types')
+    parser.add_argument('--moe_num_experts', type=int, default=None,
+                        help='Number of experts for transformer_moe')
+    parser.add_argument('--moe_top_k', type=int, default=None,
+                        help='Number of selected experts per token for transformer_moe')
     parser.add_argument('--block_type', type=str, default=None)
     parser.add_argument('--no_compile', action='store_true')
     parser.add_argument('--no_physics', action='store_true', help='Disable all physics losses')
@@ -275,6 +285,16 @@ def main():
         cfg.ffn_dropout = args.ffn_dropout
     if args.normalize_qw_by_rhov3:
         cfg.normalize_qw_by_rhov3 = True
+    if args.n_heads is not None:
+        cfg.n_heads = args.n_heads
+    if args.transformer_ffn_dim is not None:
+        cfg.transformer_ffn_dim = args.transformer_ffn_dim
+    if args.attention_dropout is not None:
+        cfg.attention_dropout = args.attention_dropout
+    if args.moe_num_experts is not None:
+        cfg.moe_num_experts = args.moe_num_experts
+    if args.moe_top_k is not None:
+        cfg.moe_top_k = args.moe_top_k
     if args.block_type is not None:
         cfg.block_type = args.block_type
 
@@ -325,6 +345,10 @@ def main():
         print(f"  Block type: {cfg.block_type}")
         print(f"  seq_len: {cfg.seq_len}, partitions: {cfg.n_partitions}")
         print(f"  d_model: {cfg.d_model}, d_state: {cfg.d_state}, n_layers: {cfg.n_layers}")
+        if cfg.block_type in ('transformer', 'transformer_moe'):
+            print(f"  Transformer heads: {cfg.n_heads}, ffn_dim: {cfg.transformer_ffn_dim}, attn dropout: {cfg.attention_dropout}")
+        if cfg.block_type == 'transformer_moe':
+            print(f"  MoE experts: {cfg.moe_num_experts}, top_k: {cfg.moe_top_k}")
         print(f"  Prediction head dims: {cfg.pred_head_hidden_dims}, dropout: {cfg.pred_head_dropout}")
         print(f"  Residual FFN: {cfg.use_residual_ffn}, hidden_dim: {cfg.ffn_hidden_dim}, dropout: {cfg.ffn_dropout}")
         print(f"  Normalize qw by rho*V^3: {cfg.normalize_qw_by_rhov3}")
@@ -516,6 +540,11 @@ def main():
             f.write(f"d_state: {cfg.d_state}\n")
             f.write(f"n_layers: {cfg.n_layers}\n")
             f.write(f"latent_dim: {cfg.latent_dim}\n")
+            f.write(f"n_heads: {cfg.n_heads}\n")
+            f.write(f"transformer_ffn_dim: {cfg.transformer_ffn_dim}\n")
+            f.write(f"attention_dropout: {cfg.attention_dropout}\n")
+            f.write(f"moe_num_experts: {cfg.moe_num_experts}\n")
+            f.write(f"moe_top_k: {cfg.moe_top_k}\n")
             f.write(f"pred_head_hidden_dims: {cfg.pred_head_hidden_dims}\n")
             f.write(f"pred_head_dropout: {cfg.pred_head_dropout}\n")
             f.write(f"use_residual_ffn: {cfg.use_residual_ffn}\n")

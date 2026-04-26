@@ -200,6 +200,100 @@ class MLPBlock(nn.Module):
         return x + self.net(self.norm(x))
 
 
+class MoEFeedForward(nn.Module):
+    """Sparse top-k routed feed-forward layer for Transformer MoE ablations."""
+    def __init__(self, d_model, hidden_dim, num_experts=4, top_k=1, dropout=0.0):
+        super().__init__()
+        if num_experts <= 0:
+            raise ValueError(f"MoE num_experts must be positive, got {num_experts}")
+        if top_k <= 0 or top_k > num_experts:
+            raise ValueError(f"MoE top_k must be in [1, num_experts], got {top_k}")
+        if not 0.0 <= dropout < 1.0:
+            raise ValueError(f"MoE dropout must be in [0, 1), got {dropout}")
+
+        self.num_experts = num_experts
+        self.top_k = top_k
+        self.gate = nn.Linear(d_model, num_experts)
+        self.experts = nn.ModuleList([
+            nn.Sequential(
+                nn.Linear(d_model, hidden_dim),
+                nn.SiLU(),
+                nn.Dropout(dropout) if dropout > 0.0 else nn.Identity(),
+                nn.Linear(hidden_dim, d_model),
+            )
+            for _ in range(num_experts)
+        ])
+
+    def forward(self, x):
+        orig_shape = x.shape
+        flat_x = x.reshape(-1, orig_shape[-1])
+
+        gate_probs = F.softmax(self.gate(flat_x), dim=-1)
+        topk_weights, topk_idx = torch.topk(gate_probs, self.top_k, dim=-1)
+        topk_weights = topk_weights / topk_weights.sum(dim=-1, keepdim=True).clamp_min(1e-9)
+
+        flat_out = torch.zeros_like(flat_x)
+        for expert_idx, expert in enumerate(self.experts):
+            expert_weights = (topk_weights * (topk_idx == expert_idx)).sum(dim=-1)
+            token_mask = expert_weights > 0
+            if token_mask.any():
+                flat_out[token_mask] += (
+                    expert(flat_x[token_mask])
+                    * expert_weights[token_mask].unsqueeze(-1)
+                )
+
+        return flat_out.reshape(orig_shape)
+
+
+class TransformerBlock(nn.Module):
+    """Pre-norm Transformer encoder block with optional MoE feed-forward layer."""
+    def __init__(self, d_model, n_heads=4, ffn_hidden_dim=128,
+                 attention_dropout=0.0, ffn_dropout=0.0,
+                 use_moe=False, moe_num_experts=4, moe_top_k=1):
+        super().__init__()
+        if d_model % n_heads != 0:
+            raise ValueError(f"d_model={d_model} must be divisible by n_heads={n_heads}")
+        if ffn_hidden_dim <= 0:
+            raise ValueError(f"Transformer FFN hidden dim must be positive, got {ffn_hidden_dim}")
+        if not 0.0 <= attention_dropout < 1.0:
+            raise ValueError(f"Attention dropout must be in [0, 1), got {attention_dropout}")
+        if not 0.0 <= ffn_dropout < 1.0:
+            raise ValueError(f"Transformer FFN dropout must be in [0, 1), got {ffn_dropout}")
+
+        self.attn_norm = nn.LayerNorm(d_model)
+        self.attn = nn.MultiheadAttention(
+            embed_dim=d_model,
+            num_heads=n_heads,
+            dropout=attention_dropout,
+            batch_first=True,
+        )
+        self.attn_dropout = nn.Dropout(attention_dropout) if attention_dropout > 0 else nn.Identity()
+        self.ffn_norm = nn.LayerNorm(d_model)
+
+        if use_moe:
+            self.ffn = MoEFeedForward(
+                d_model=d_model,
+                hidden_dim=ffn_hidden_dim,
+                num_experts=moe_num_experts,
+                top_k=moe_top_k,
+                dropout=ffn_dropout,
+            )
+        else:
+            self.ffn = nn.Sequential(
+                nn.Linear(d_model, ffn_hidden_dim),
+                nn.SiLU(),
+                nn.Dropout(ffn_dropout) if ffn_dropout > 0.0 else nn.Identity(),
+                nn.Linear(ffn_hidden_dim, d_model),
+            )
+
+    def forward(self, x):
+        h = self.attn_norm(x)
+        attn_out, _ = self.attn(h, h, h, need_weights=False)
+        x = x + self.attn_dropout(attn_out)
+        x = x + self.ffn(self.ffn_norm(x))
+        return x
+
+
 class PredictionHead(nn.Module):
     """Per-output prediction head from latent features."""
     def __init__(self, d_in, hidden_dims=None, dropout=0.0, n_outputs=1):
@@ -258,6 +352,7 @@ class MambaAutoencoder(nn.Module):
             nn.LayerNorm(d),
             nn.SiLU()
         )
+        self.pos_embed = None
 
         if config.block_type in ('mamba2', 'mamba3'):
             use_rope = config.use_rope and config.block_type == 'mamba3'
@@ -275,6 +370,22 @@ class MambaAutoencoder(nn.Module):
         elif config.block_type == 'mlp':
             self.encoder = nn.ModuleList([
                 MLPBlock(d_model=d, expand=config.expand)
+                for _ in range(config.n_layers)
+            ])
+        elif config.block_type in ('transformer', 'transformer_moe'):
+            self.pos_embed = nn.Parameter(torch.zeros(1, config.seq_len, d))
+            nn.init.normal_(self.pos_embed, mean=0.0, std=0.02)
+            self.encoder = nn.ModuleList([
+                TransformerBlock(
+                    d_model=d,
+                    n_heads=config.n_heads,
+                    ffn_hidden_dim=config.transformer_ffn_dim,
+                    attention_dropout=config.attention_dropout,
+                    ffn_dropout=config.ffn_dropout,
+                    use_moe=(config.block_type == 'transformer_moe'),
+                    moe_num_experts=config.moe_num_experts,
+                    moe_top_k=config.moe_top_k,
+                )
                 for _ in range(config.n_layers)
             ])
         else:
@@ -303,6 +414,8 @@ class MambaAutoencoder(nn.Module):
 
     def forward(self, x):
         h = self.input_proj(x)
+        if self.pos_embed is not None:
+            h = h + self.pos_embed[:, :h.shape[1], :]
         for layer in self.encoder:
             if self.training:
                 h = checkpoint(layer, h, use_reentrant=False)

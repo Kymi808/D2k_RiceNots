@@ -31,6 +31,11 @@ def main():
     parser.add_argument('--ffn_hidden_dim', type=int, default=None)
     parser.add_argument('--ffn_dropout', type=float, default=None)
     parser.add_argument('--normalize_qw_by_rhov3', action='store_true')
+    parser.add_argument('--n_heads', type=int, default=None)
+    parser.add_argument('--transformer_ffn_dim', type=int, default=None)
+    parser.add_argument('--attention_dropout', type=float, default=None)
+    parser.add_argument('--moe_num_experts', type=int, default=None)
+    parser.add_argument('--moe_top_k', type=int, default=None)
     parser.add_argument('--no_physics', action='store_true')
     parser.add_argument('--no_reconstruction', action='store_true')
     parser.add_argument('--lambda_recon', type=float, default=None)
@@ -60,6 +65,16 @@ def main():
         cfg.ffn_dropout = args.ffn_dropout
     if args.normalize_qw_by_rhov3:
         cfg.normalize_qw_by_rhov3 = True
+    if args.n_heads is not None:
+        cfg.n_heads = args.n_heads
+    if args.transformer_ffn_dim is not None:
+        cfg.transformer_ffn_dim = args.transformer_ffn_dim
+    if args.attention_dropout is not None:
+        cfg.attention_dropout = args.attention_dropout
+    if args.moe_num_experts is not None:
+        cfg.moe_num_experts = args.moe_num_experts
+    if args.moe_top_k is not None:
+        cfg.moe_top_k = args.moe_top_k
     if args.w_qw is not None:
         cfg.w_qw = args.w_qw
     if args.lambda_recon is not None:
@@ -102,6 +117,10 @@ def main():
     print(f"Model: {n_params:,} parameters, block_type={cfg.block_type}")
     print(f"Prediction head dims: {cfg.pred_head_hidden_dims}, dropout={cfg.pred_head_dropout}")
     print(f"Residual FFN: {cfg.use_residual_ffn}, hidden_dim={cfg.ffn_hidden_dim}, dropout={cfg.ffn_dropout}")
+    if cfg.block_type in ('transformer', 'transformer_moe'):
+        print(f"Transformer heads: {cfg.n_heads}, ffn_dim={cfg.transformer_ffn_dim}, attention_dropout={cfg.attention_dropout}")
+    if cfg.block_type == 'transformer_moe':
+        print(f"MoE experts: {cfg.moe_num_experts}, top_k={cfg.moe_top_k}")
     print(f"Normalize qw by rho*V^3: {cfg.normalize_qw_by_rhov3}")
     print(f"Reconstruction weight: {cfg.lambda_recon}")
     print(f"Target weights: {dict(zip(y_col_names, cfg.y_weights))}")

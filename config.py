@@ -32,6 +32,11 @@ class Config:
     ffn_hidden_dim: int = 128
     ffn_dropout: float = 0.0
     normalize_qw_by_rhov3: bool = False
+    n_heads: int = 4
+    transformer_ffn_dim: int = 128
+    attention_dropout: float = 0.0
+    moe_num_experts: int = 4
+    moe_top_k: int = 1
 
     # --- Input features ---
     x_cols: List[str] = field(default_factory=lambda: [
