@@ -45,6 +45,15 @@ def main():
     parser.add_argument('--use_residual_ffn', action='store_true')
     parser.add_argument('--ffn_hidden_dim', type=int, default=None)
     parser.add_argument('--ffn_dropout', type=float, default=None)
+    parser.add_argument('--normalize_qw_by_rhov3', action='store_true')
+    parser.add_argument('--block_type', type=str, default=None)
+    parser.add_argument('--n_heads', type=int, default=None)
+    parser.add_argument('--transformer_ffn_dim', type=int, default=None)
+    parser.add_argument('--attention_dropout', type=float, default=None)
+    parser.add_argument('--moe_num_experts', type=int, default=None)
+    parser.add_argument('--moe_top_k', type=int, default=None)
+    parser.add_argument('--no_reconstruction', action='store_true')
+    parser.add_argument('--lambda_recon', type=float, default=None)
     parser.add_argument('--qw_only', action='store_true')
     args = parser.parse_args()
 
@@ -68,6 +77,24 @@ def main():
         cfg.ffn_hidden_dim = args.ffn_hidden_dim
     if args.ffn_dropout is not None:
         cfg.ffn_dropout = args.ffn_dropout
+    if args.normalize_qw_by_rhov3:
+        cfg.normalize_qw_by_rhov3 = True
+    if args.block_type is not None:
+        cfg.block_type = args.block_type
+    if args.n_heads is not None:
+        cfg.n_heads = args.n_heads
+    if args.transformer_ffn_dim is not None:
+        cfg.transformer_ffn_dim = args.transformer_ffn_dim
+    if args.attention_dropout is not None:
+        cfg.attention_dropout = args.attention_dropout
+    if args.moe_num_experts is not None:
+        cfg.moe_num_experts = args.moe_num_experts
+    if args.moe_top_k is not None:
+        cfg.moe_top_k = args.moe_top_k
+    if args.lambda_recon is not None:
+        cfg.lambda_recon = args.lambda_recon
+    if args.no_reconstruction:
+        cfg.lambda_recon = 0.0
     if args.qw_only:
         cfg.predict_pw = False
         cfg.predict_tw = False
@@ -116,9 +143,16 @@ def main():
         'use_residual_ffn': cfg.use_residual_ffn,
         'ffn_hidden_dim': cfg.ffn_hidden_dim,
         'ffn_dropout': cfg.ffn_dropout,
+        'normalize_qw_by_rhov3': cfg.normalize_qw_by_rhov3,
         'block_type': cfg.block_type,
+        'n_heads': cfg.n_heads,
+        'transformer_ffn_dim': cfg.transformer_ffn_dim,
+        'attention_dropout': cfg.attention_dropout,
+        'moe_num_experts': cfg.moe_num_experts,
+        'moe_top_k': cfg.moe_top_k,
         'use_rope': cfg.use_rope,
         'use_trapezoidal': cfg.use_trapezoidal,
+        'lambda_recon': cfg.lambda_recon,
         'seq_len': cfg.seq_len,
         'partition_stride': cfg.partition_stride,
         'points_per_solution': cfg.points_per_solution,
@@ -132,10 +166,7 @@ def main():
     # Verify model loads correctly
     print("Verifying model loads...")
     model = MambaAutoencoder(cfg)
-    for name, param in model.named_parameters():
-        if 'A_log' in name:
-            param.data = param.data.clone()
-    model.load_state_dict(cleaned, strict=False)
+    model.load_state_dict(cleaned)
     n_params = sum(p.numel() for p in model.parameters())
 
     print(f"\nPackaged model saved to {args.output}/")

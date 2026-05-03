@@ -485,12 +485,9 @@ def main():
 
         print(f"  Loading model from {ckpt_path}...")
         model = MambaAutoencoder(cfg).to(device)
-        for pname, param in model.named_parameters():
-            if 'A_log' in pname:
-                param.data = param.data.clone()
         ckpt = torch.load(ckpt_path, weights_only=True, map_location=device)
         cleaned = {k.replace('_orig_mod.', ''): v for k, v in ckpt.items()}
-        model.load_state_dict(cleaned, strict=False)
+        model.load_state_dict(cleaned)
 
         print(f"  Running inference on {X_test_s.shape[0]} test partitions...")
         all_preds = run_model(model, X_test_s, device)

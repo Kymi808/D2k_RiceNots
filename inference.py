@@ -61,7 +61,10 @@ class MambaSurrogate:
         for key in ['d_model', 'd_state', 'd_conv', 'n_layers', 'latent_dim',
                      'expand', 'pred_head_hidden_dims', 'pred_head_dropout',
                      'use_residual_ffn', 'ffn_hidden_dim', 'ffn_dropout',
-                     'block_type', 'use_rope', 'use_trapezoidal',
+                     'normalize_qw_by_rhov3', 'block_type', 'n_heads',
+                     'transformer_ffn_dim', 'attention_dropout',
+                     'moe_num_experts', 'moe_top_k',
+                     'use_rope', 'use_trapezoidal', 'lambda_recon',
                      'seq_len', 'partition_stride', 'points_per_solution']:
             if key in self.config_dict:
                 setattr(self.cfg, key, self.config_dict[key])
@@ -77,12 +80,9 @@ class MambaSurrogate:
 
         # Load model
         self.model = MambaAutoencoder(self.cfg).to(self.device)
-        for name, param in self.model.named_parameters():
-            if 'A_log' in name:
-                param.data = param.data.clone()
         weights = torch.load(os.path.join(model_dir, 'model_weights.pt'),
                            weights_only=True, map_location=self.device)
-        self.model.load_state_dict(weights, strict=False)
+        self.model.load_state_dict(weights)
         self.model.eval()
 
         # Load scalers
@@ -138,6 +138,24 @@ class MambaSurrogate:
             partitions.append(part)
         return np.stack(partitions)  # (n_partitions, seq_len, 7)
 
+    def _raw_partition(self, raw_input, start, end):
+        """Return a raw physical-space partition with the same padding as model input."""
+        part = raw_input[start:end]
+        if len(part) < self.cfg.seq_len:
+            pad_len = self.cfg.seq_len - len(part)
+            part = np.concatenate([part, np.tile(part[-1:], (pad_len, 1))], axis=0)
+        return part
+
+    def _add_qw_physics_log_if_needed(self, pred_log, raw_part, name):
+        """Undo qw/(rho*V^3) target normalization for packaged inference."""
+        if not getattr(self.cfg, 'normalize_qw_by_rhov3', False) or name != 'qw':
+            return pred_log
+
+        velocity = raw_part[:, 3]
+        density = raw_part[:, 4]
+        phys_log = np.log10(np.clip(density * np.power(velocity, 3), 1e-12, None))
+        return pred_log + phys_log
+
     @torch.no_grad()
     def predict(self, velocity, density, aoa, dynamic_pressure):
         """
@@ -177,8 +195,11 @@ class MambaSurrogate:
 
             # Inverse transform: standardized -> log10 -> physical
             pred_phys_parts = []
-            for part in pred_parts:
+            for part_idx, part in enumerate(pred_parts):
                 pred_log = part[:, 0] * self.scaler_y.scale_[idx] + self.scaler_y.mean_[idx]
+                start, end = self.partitions[part_idx]
+                raw_part = self._raw_partition(raw_input, start, end)
+                pred_log = self._add_qw_physics_log_if_needed(pred_log, raw_part, name)
                 pred_phys_parts.append(np.power(10.0, pred_log))
 
             # Overlap averaging

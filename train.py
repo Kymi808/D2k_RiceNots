@@ -95,6 +95,7 @@ def compute_loss(out, X_batch, Y_batch, cfg, y_col_names, y_weights,
     if physics_enabled:
         phys_raw = physics_loss_fn(preds_dict, X_batch, scaler_X)
         phys_total, phys_weighted = compute_physics_loss(phys_raw, cfg, epoch=epoch)
+        phys_total = phys_total.to(device=X_batch.device, dtype=total_data_loss.dtype)
         for k, v in phys_weighted.items():
             loss_dict[f'phys_{k}'] = v
     else:
@@ -242,6 +243,20 @@ def parse_head_dims(spec):
     return dims
 
 
+def freeze_reconstruction_branch_if_unused(model, cfg):
+    """Disable gradients for reconstruction-only parameters when recon loss is off."""
+    if cfg.lambda_recon > 0:
+        return 0
+
+    frozen = 0
+    for module in (model.to_latent, model.recon_head):
+        for param in module.parameters():
+            if param.requires_grad:
+                param.requires_grad_(False)
+                frozen += param.numel()
+    return frozen
+
+
 def main():
     """Main training entry point: setup DDP, load data, train model, evaluate."""
     args = parse_args()
@@ -379,11 +394,14 @@ def main():
 
     # Model
     model = MambaAutoencoder(cfg).to(device)
+    frozen_recon_params = freeze_reconstruction_branch_if_unused(model, cfg)
 
     if is_main(rank):
         n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         print(f"Model: {n_params:,} trainable parameters")
         print(f"Prediction heads: {list(model.pred_heads.keys())}")
+        if frozen_recon_params:
+            print(f"Reconstruction branch frozen: {frozen_recon_params:,} parameters")
 
     # torch.compile
     if not args.no_compile and torch.cuda.is_available():
@@ -395,13 +413,20 @@ def main():
 
     # DDP wrap
     if distributed:
-        model = DDP(model, device_ids=[local_rank])
+        find_unused = cfg.lambda_recon <= 0 or cfg.block_type == 'transformer_moe'
+        model = DDP(model, device_ids=[local_rank], find_unused_parameters=find_unused)
+        if is_main(rank) and find_unused:
+            print("DDP unused-parameter detection enabled")
 
     # Physics loss
     physics_loss_fn = PhysicsLoss(scaler_y, y_col_names, cfg).to(device)
 
     # Optimizer & scheduler
-    optimizer = torch.optim.AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
+    optimizer = torch.optim.AdamW(
+        (p for p in model.parameters() if p.requires_grad),
+        lr=cfg.lr,
+        weight_decay=cfg.weight_decay,
+    )
     warmup_epochs = 5
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', factor=0.5, patience=10, min_lr=1e-6

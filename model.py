@@ -71,7 +71,7 @@ class SelectiveSSM(nn.Module):
         self.dt_proj = nn.Linear(1, self.d_inner, bias=True)
 
         A = torch.arange(1, d_state + 1, dtype=torch.float32)
-        self.A_log = nn.Parameter(torch.log(A).unsqueeze(0).expand(self.d_inner, -1))
+        self.A_log = nn.Parameter(torch.log(A).unsqueeze(0).repeat(self.d_inner, 1))
 
         # Mamba-3: BC bias
         if use_rope or use_trapezoidal:
